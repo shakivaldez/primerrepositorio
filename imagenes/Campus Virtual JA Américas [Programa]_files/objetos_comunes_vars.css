@@ -1,0 +1,90 @@
+/********************************************************************************/
+/*                                                                              */
+/* Plataforma e-ducativa.  Version 14.05.00-109 - Argentina                     */
+/*                                                                              */
+/* Copyright (c)  de e-ducativa Educación Virtual S.A.                          */
+/*                                                                              */
+/********************************************************************************/
+/*
+    Variables comunes en todo el producto
+    Se pueden redefinir a nivel skin
+*/
+:root {
+    /* Temas */
+    --theme-txcolor-osc: rgba(0, 0, 0, .8);
+    --theme-bgcolor-osc: rgba(0, 0, 0, .4);
+    --theme-bgcolor-osc2: rgba(0, 0, 0, .2);
+
+    --theme-bgcolor-cla: rgba(200, 200, 200, .9);
+    --theme-bgcolor-cla2: rgba(200, 200, 200, .4);
+    --theme-bgcolor-cla3: rgba(255, 255, 255, .8);
+
+    /* -------
+       BOTONES
+       ------- */
+    /* Boton primario */
+    --theme-boton-verde: #529a2d;
+    --theme-boton-verde_hover: #458823;
+
+    /* Boton secundario */
+    --theme-boton-azul: #2766be;
+    --theme-boton-azul_hover: #205bac;
+
+    /* Boton terciario */
+    --theme-boton-gris: #757575;
+    --theme-boton-gris_hover: #646464;
+
+    /* Boton eliminar/limpiar */
+    --theme-boton-red: #be2731;
+    --theme-boton-red_hover: #ae0d18;
+
+    /* Programa */
+    --theme-item-obligatorio-color: #dd3906;
+    --theme-item-obligatorio-color_hover: #c44135;
+
+    --theme-item-opcional-color: #5f9bdb;
+    --theme-item-opcional-color_hover: #528bc8;
+
+    --theme-item-aprobado-color: #14a568;
+    --theme-unidad-correlativa-color: #757575;
+    --theme-retomar-color: #0247a8;
+    --theme-error-color: #c40000;
+
+    /* Colores en tablas */
+    --theme-desactivas: #ffe9c0;
+    --theme-correlativo: #e4fdfd;
+    --theme-verde: #e0ffe0;
+    --theme-amarillo: #FFFF99;
+
+    --theme-bgcolor-titulo: #666666;
+    --theme-txcolor-titulo: white;
+
+    --theme-bgcolor-columnas: #8a8a8a;
+    --theme-txcolor-columnas: white;
+    --theme-txcolor-columnas_hover: #ffcc00;
+
+    --theme-bgcolor-pie: #d9d9d9;
+    --theme-txcolor-pie: #666666;
+
+    --theme-bgcolor-linea: rgba(230, 230, 230, .94);
+    --theme-bgcolor-impar: rgba(128, 128, 128, .05);
+
+    /* Alertas */
+    --theme-alert-info-background: #e9f5ff;
+    --theme-alert-info-border: #1c9adc;
+    --theme-alert-info-text: #21609e;
+
+    --theme-alert-success-background: #f5fffc;
+    --theme-alert-success-border: #27be7f;
+    --theme-alert-success-text: #1b8358;
+
+    --theme-alert-error-background: #fff6f7;
+    --theme-alert-error-border: #e0483a;
+    --theme-alert-error-text: #721c24;
+
+    /* -- tiles -- */
+    --theme-filter-link: brightness(60%);
+    --theme-filter-link_hover: brightness(30%);
+
+    --theme-lineheight: 28px;
+}

@@ -1,0 +1,199 @@
+/********************************************************************************/
+/*                                                                              */
+/* Plataforma e-ducativa.  Version 14.05.00-109 - Argentina                     */
+/*                                                                              */
+/* Copyright (c)  de e-ducativa Educación Virtual S.A.                          */
+/*                                                                              */
+/********************************************************************************/
+ /**
+  * @objeto: Listado de Categorias
+  *
+  */
+
+    /*reset*/
+    .lista_categorias,
+    .lista_categorias > li
+    { margin: 0; padding: 0; list-style: none; }
+
+    .lista_categorias .link {
+        position: relative;
+        display: block;
+        border-bottom: 1px solid #eee;
+        padding: 7px 10px 10px;
+        color: #000;
+        text-decoration: none;
+        line-height: 1.2em;
+        transition: all .4s;
+    }
+    .lista_categorias .link:hover,
+    .lista_categorias .link:active {
+        border-bottom-color: #949494;
+        color: #2766BE;
+    }
+
+    /* layout interno */
+    .lista_categorias .col_izq {
+        position: relative;
+        float: left;
+        margin-top: 12px;
+        margin-right: 15px;
+        max-width: 24px;
+        padding: 2px 10px 0;
+        text-align: center;
+        box-shadow: 0 0 2px 0 #CED6D7;
+        border: solid 1px #CED6D7;
+    }
+
+    .lista_categorias .col_izq:after {
+        content: '';
+        position: absolute;
+        top: 0px;
+        right: -5px;
+        width: 0px;
+        height: 0px;
+        border-style: solid;
+        border-width: 4px 6px 0 0;
+        border-color: #fff transparent transparent transparent;
+    }
+
+    .lista_categorias .col_izq:before {
+        content: '';
+        position: absolute;
+        top: -1px;
+        right: -9px;
+        width: 0px;
+        height: 0px;
+        border-style: solid;
+        border-width: 5px 8px 0 0;
+        border-color: #CED6D7 transparent transparent transparent;
+    }
+
+    .lista_categorias .col_der {
+        position: relative;
+        margin-left: 60px;
+        box-sizing: border-box;
+        transition: all .4s;
+    }
+
+    .lista_categorias .link .col_der        { padding-left: 0; padding-right: 5px; }
+    .lista_categorias .link:active .col_der,
+    .lista_categorias .link:hover .col_der  { padding-left: 5px; padding-right: 0; }
+
+    .lista_categorias .burbuja_estado { position: absolute; right: 10px; top: 15px; }
+
+    /* estilos */
+    .lista_categorias .icono { display: inline-block; max-width: 24px; max-height: 24px; }
+    .lista_categorias .contador { font-size: .9rem; }
+    .lista_categorias .nombre   { display: block; line-height: 1.3em; padding: 4px 0; text-decoration: none; }
+    .lista_categorias .descripcion   { color: #8f8f8f; font-size: .9rem; }
+    .lista_categorias .ultima_actualizacion     { font-size: .8rem;  color: #8f8f8f; }
+    .lista_categorias .ultima_actualizacion a   { color: #000; text-decoration: none; }
+    .lista_categorias .ultima_actualizacion a:hover { text-decoration: underline; }
+
+    .Categorizador {
+        margin: 25px 0 0 0;
+        padding: 5px 0 5px;
+        color: #8a8a8a;
+        font-weight: 300;
+        font-size: 1rem;
+    }
+
+    /* Responsive */
+    @media screen and (max-width:650px)   {
+        .lista_categorias .burbuja_estado { position: relative; top: auto; right: auto; }
+    }
+
+
+
+ /*------------------------------------------------------------------------------------------------------*/
+
+ /**
+  * @objeto: Grupos de trabajo
+  *
+  */
+
+    .Contenido-ListadoGruposTrabajo { clear: both; }
+
+ /*------------------------------------------------------------------------------------------------------*/
+
+
+ /**
+  * @objeto: Items para las categorias
+  *
+  */
+
+    .subtitulo_items    { margin: 0; padding: 15px 0 10px; color: #8A8A8A; font-weight: 300; font-size: 1rem; }
+
+    /*reset*/
+    .lista_items,
+    .lista_items > li {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+    .lista_items > li {
+        position: relative;
+        padding: 10px 5px;
+        border-bottom: solid 1px #eeeeee;
+        transition-duration: .2s;
+    }
+    .lista_items > li:hover { border-bottom-color: #949494; }
+
+    .lista_items > li.no_leido          { background-color: #f5f5f5; transition: all .4s;}
+    .lista_items > li.no_leido .nombre  { font-weight: bold; }
+    .lista_items > li.no_leido:hover    { background-color: #fff; }
+
+    .lista_items .icono                 { display: inline-block; vertical-align: middle; width: 30px; color: #000; }
+    .lista_items > li a                 { text-decoration: none; }
+    .lista_items > li > a               { color: #2766be; display: block; }
+    .lista_items .nombre                { font-size: 1rem; }
+    .lista_items > li > a:hover .nombre { color: #003d93; }
+    .lista_items .info_adicional        { font-size: .8rem; color: #8b8b8b; }
+    .lista_items .buttonDelete          { padding: 4px 6px; }
+
+    .lista_items .descripcion                   { padding-left: 35px; }
+    .lista_items .descripcion_button            { display: inline-block; vertical-align: middle; font-size: .8rem; color: #2766be; cursor: pointer; }
+    .lista_items .descripcion_button:hover      { color: #000; text-decoration: underline; }
+    .lista_items .descripcion .tiny_personalizado   { padding: 10px; }
+
+    .lista_items .metadata          { padding-left: 35px; font-size: .8rem; color: #8f8f8f; }
+    .lista_items .metadata a        { color: #000; }
+    .lista_items .metadata a:hover  { text-decoration: underline; }
+    .lista_items .detalle_extra     { padding: .4em 0 0 35px; font-size: .8rem; color: #8f8f8f; }
+
+    .lista_items .burbuja_estado    { position: absolute; right: 5px; top: 5px; }
+
+    .publicado_por      { font-size: .8em; color: #8f8f8f; }
+    span.publicado_por  { display: inline-block; vertical-align: middle;  }
+    .foto_usuario img   { border-radius: 100px; }
+    .publicado_por a    { color: #000; text-decoration: none; cursor: pointer; }
+    .publicado_por a:hover { text-decoration: underline; }
+
+    /* Modo grilla */
+    .lista_items.grilla:after {
+        content: '';
+        display: block;
+        clear: both;
+    }
+    .lista_items.grilla > li {
+        float: left;
+        box-sizing: border-box;
+        width: calc(33.33% - 12px);
+        margin: 0 6px 12px;
+        padding: 12px 20px;
+        border: solid 1px #eeeeee;
+        border-radius: 4px;
+        box-shadow: 2px 2px 10px #0000000a;
+    }
+    .lista_items.grilla > li:hover { border-color: #949494; }
+
+    .lista_items.grilla .icono          { display: block; width: auto; margin: 0 auto; }
+    .lista_items.grilla .nombre         { display: block; padding: 5px 0; text-align: center; }
+    .lista_items.grilla .info_adicional { display: none; }
+    .lista_items.grilla .descripcion    { display: none; }
+    .lista_items.grilla .metadata       { padding-left: 0px; text-align: center; }
+
+    .lista_items.grilla .metadata .flex {
+        display: flex;
+        justify-content: center;
+    }

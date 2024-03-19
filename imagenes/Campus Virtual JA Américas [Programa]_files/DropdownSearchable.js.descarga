@@ -1,0 +1,128 @@
+/********************************************************************************/
+/*                                                                              */
+/* Plataforma e-ducativa.  Version 14.05.00-109 - Argentina                     */
+/*                                                                              */
+/* Copyright (c)  de e-ducativa Educación Virtual S.A.                          */
+/*                                                                              */
+/********************************************************************************/
+/**
+ * @class
+ * @classdesc Clase wraper que implementa la libreria Choices para armar un combo o
+ * lista deplegable donde se pueden buscar opciones para seleccionar
+ *
+ * @requires Choices de choices/choices.js
+ * @requires choices.css Archivo css necesario para que se renderice correctamente
+ */
+class DropdownSearchable {
+    /**
+     * Clases que define la libreria {@link https://github.com/Choices-js/Choices/tree/v9.0.1#classNames Choices}.
+     * Estan solamente las que se usan actualmente en el campus
+     */
+    static classNamesDefaults = {
+        listSingle: 'choices__list--single',
+        containerOuter: 'choices',
+    };
+
+    /**
+     * {@link https://github.com/Choices-js/Choices#configuration-options Configuration options (see current version)}
+     *
+     * @param {HTMLElement} element Elemento relacionado a la lista desplegable renderizada por Choices
+     * @param {Object} options  Para ver todas las opciones disponibles ver el link "Configuration options" en la descripcion
+     */
+    constructor (element, options) {
+        this._element = element;
+
+        // Opciones configurables que son usadas actualmente en el campus
+        this._options = {
+            itemSelectText: options.itemSelectText,
+            // La opciones (options.choices) deben venir ordenadas
+            shouldSort: false,
+            noResultsText: options.noResultsText,
+            searchPlaceholderValue: options.searchPlaceholderValue,
+            choices: options.choices,
+            searchFields: options.searchFields || ['label'],
+        };
+
+        // La cantidad de resultados debe ser el total de opciones seleccionables. El default es 4
+        if (options.searchResultLimit) {
+            this._options.searchResultLimit = options.searchResultLimit;
+        }
+
+        if (options.position) {
+            this._options.position = options.position;
+        }
+
+        if (options.callbackOnCreateTemplates) {
+            this._options.callbackOnCreateTemplates = options.callbackOnCreateTemplates;
+        }
+
+        if (options.hasOwnProperty('searchEnabled')) {
+            this._options.searchEnabled = options.searchEnabled;
+        }
+
+        if (options.hasOwnProperty('resetScrollPosition')) {
+            this._options.resetScrollPosition = options.resetScrollPosition;
+        }
+
+        if (options.classNames) {
+            this._options.classNames = options.classNames;
+        }
+    }
+
+    render() {
+        this._instance = new Choices(this._element, this._options);
+    }
+
+    /**
+     *
+     * @returns Instancia de new Choices()
+     */
+    getInstance() {
+        return this._instance;
+    }
+
+    setChoiceByValue(value) {
+        this.getInstance().setChoiceByValue(value);
+    }
+
+    /**
+     * @method addEvent
+     *
+     * @description Permite agregar eventos personalizados propios de Choices
+     *
+     * @see {@link https://github.com/Choices-js/Choices/tree/v9.0.1#events Eventos de Choices.js}
+     *
+     * @param {String} eventName Nombre del evento
+     * @param {Callback} functionCallback
+     */
+    addEvent(eventName = '', functionCallback) {
+        // Si se quieren usar mas eventos, se debe agregar al array
+        const eventsUsedToday = ['addItem'];
+
+        if (!eventsUsedToday.includes(eventName)) {
+            console.warn('Error: Evento no permitido');
+            return;
+        }
+
+        this.getInstance().passedElement.element.addEventListener(eventName, functionCallback, false);
+    }
+
+    disable() {
+        this.getInstance().disable();
+    }
+
+    enable() {
+        this.getInstance().enable();
+    }
+
+    hidePlaceholderInList() {
+        const parentNode = this._element.parentNode;
+        const selector = `#${parentNode.id}`;
+        const styles = `${selector} .choices__list--dropdown .choices__placeholder { display: none; }`;
+
+        const style = document.createElement('style');
+        style.innerHTML = styles;
+
+        parentNode.insertAdjacentElement('beforebegin', style);
+    }
+}

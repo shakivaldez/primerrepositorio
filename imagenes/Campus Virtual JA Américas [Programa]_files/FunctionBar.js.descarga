@@ -1,0 +1,146 @@
+/********************************************************************************/
+/*                                                                              */
+/* Plataforma e-ducativa.  Version 14.05.00-109 - Argentina                     */
+/*                                                                              */
+/* Copyright (c)  de e-ducativa Educación Virtual S.A.                          */
+/*                                                                              */
+/********************************************************************************/
+Educativa.FunctionBar = Class.create({
+    clase_separador: 'separador',
+    initialize: function(args){
+
+
+        if ( typeof args.container == 'undefined' ) args.container =  window.document.body;
+
+        Object.extend( this, args);
+
+
+        // Frame //
+        $(this.container).insert(
+            this.frame = new Element('div', { className: 'header_nav color_plataforma_back' })
+        );
+
+        // Body //
+        this.frame.insert( this.function_bar = new Element('nav', { className: 'function_bar' }) );
+
+        // Col derecha //
+        this.col_derecha = new Element( 'div', { className: 'col_derecha' } );
+        this.function_bar.insert( this.col_derecha );
+
+        this.apps_box = new Element( 'div', { className : 'apps_box' } )
+        this.apps = new Element( 'div', { className : 'apps' } );
+        this.apps_box.insert( this.apps );
+        this.col_derecha.insert( this.apps_box );
+
+        this.render_botonera();
+
+    },
+
+    get_nombre_usuario: function(){
+        return this.user_nombre_completo.split(' ').map( function( palabra ){
+            return palabra.capitalize()
+        }).join( ' ' );
+    } ,
+
+    get_url_logout: function(){
+
+        if( this.url_login_unico ){
+            return this.url_login_unico + "index.cgi?wAccion=logout";
+        }
+
+        if ( this.standalone ){
+            /* Utilizado por sitio standalone, ya que el aula standalone utiliza el
+            FunctionBar que es encuentra definido en Educativa/Aula/FunctionBar.js */
+            return this.url_logoff + "index.cgi?wAccion=cerrar";
+        }else{
+            /* Utilizado por sitio y bitacora en entorno open, se redirige al logoff
+            del aula */
+            return this.url_logoff + "logoff.cgi";
+        }
+
+
+    } ,
+
+    render_separador: function(){
+        this.function_bar.insert(
+            new Element('span', {
+                className: this.clase_separador
+            }).update( "|" )
+        );
+    },
+
+    render_nombre_usuario: function(){
+        var nombre_usuario = this.get_nombre_usuario();
+
+        this.usuario_frame = new Element('span', {
+            className: 'usuario'
+        }).update( nombre_usuario );
+
+        this.col_derecha.insert( this.usuario_frame );
+    } ,
+
+    render_btn_logout: function(){
+
+        this.btn_logout = new Element('a', {
+            className: 'logout',
+            href: 'javascript:;'
+        }).update( Educativa.Dict.translate('SALIR').capitalize() );
+
+        this.col_derecha.insert( this.btn_logout );
+        this.btn_logout.observe('click',function(){
+            this.cerrar_sesion();
+        }.bind(this));
+    } ,
+
+    render_botonera: function(){
+        this.render_nombre_usuario();
+        this.render_btn_logout();
+    },
+
+    cerrar_sesion: function(){
+
+        window.location = this.get_url_logout();
+    },
+
+    render_btn_administracion: function () {
+        if( this.url_administracion ) {
+
+            //id utilizado para ocultar opcion desde app
+            var link_administracion = new Element('a', {
+                className: 'app admin_link',
+                title    : Educativa.Dict.translate('ADMINISTRACION'),
+                href     : this.url_administracion,
+                id       : 'administracion_link_aula',
+                target   : '_blank'
+            });
+
+            this.icono_external_link = document.createElement('span');
+            this.icono_external_link.id = 'icono_external_link';
+            this.icono_external_link.style.display = 'none';
+            this.icono_external_link.className = 'icono external_link';
+
+            let icono_external_link = document.createElement('i');
+            icono_external_link.className = 'fas fa-external-link';
+
+            this.icono_external_link.appendChild(icono_external_link);
+            var self = this;
+
+            link_administracion.addEventListener('mouseover', function () {
+                self.icono_external_link.style.display = '';
+            });
+            link_administracion.addEventListener('mouseout', function () {
+                self.icono_external_link.style.display = 'none';
+            });
+
+
+            link_administracion.insert( new Element( 'i', { className : 'icono fas fa-cog' } ) );
+            link_administracion.insert( new Element( 'span', { className : 'label' } ).update( Educativa.Dict.translate('ADMINISTRACION') ) );
+            link_administracion.insert( this.icono_external_link );
+
+            this.apps.insert( link_administracion );
+        }
+    },
+
+
+});
+

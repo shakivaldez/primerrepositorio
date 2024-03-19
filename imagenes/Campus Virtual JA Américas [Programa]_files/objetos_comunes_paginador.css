@@ -1,0 +1,143 @@
+/********************************************************************************/
+/*                                                                              */
+/* Plataforma e-ducativa.  Version 14.05.00-109 - Argentina                     */
+/*                                                                              */
+/* Copyright (c)  de e-ducativa Educación Virtual S.A.                          */
+/*                                                                              */
+/********************************************************************************/
+/*********************
+  @Objeto: paginador
+**********************/
+.paginador {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    margin: 12px 0 4px;
+    padding: 0 6px;
+    text-align: center;
+}
+
+.paginador .flecha {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 23px;
+    padding: 0px 8px;
+    border-radius: 3px;
+    color: #949494;
+    cursor: pointer;
+}
+
+.paginador .flecha.lastPage,
+.firstPage {
+    font-size: 0.9375rem;
+    font-family: "Roboto", sans-serif, Arial;
+    /*width: 24px;*/
+}
+
+.paginador .flecha.prevPage,
+.nextPage {
+    font-size: 1.4375rem;
+    font-family: "Roboto", sans-serif, Arial;
+}
+
+/* Agrandamos tamanio de next y prev por ser un svg mas chico */
+.paginador .nextPage svg,
+.paginador .prevPage svg { font-size: 1.45rem; }
+
+/* Igualamos altura span de next y prev */
+.paginador .firstPage svg,
+.paginador .lastPage svg {
+    height: 22px;
+    font-size: .9375rem;
+}
+
+.paginador .flecha:hover {
+    color: #dbdbdb;
+    background-color: #878787;
+}
+
+.paginador .flecha.disable {
+    display: none;
+    height: inherit;
+}
+
+.paginador .total_registros {
+    font-size: 0.8125rem;
+    font-family: "Roboto", sans-serif, Arial;
+    color: #6c6c6c;
+    padding-right: 24px;
+}
+
+.paginador .selector {
+    position: relative;
+    width: auto;
+    margin: 2px 13px;
+    font-size: 0.8125rem;
+    font-family: "Roboto", sans-serif, Arial;
+}
+
+.paginador .ubicacion {
+    display: block;
+    border-radius: 3px;
+    padding: 4px 8px;
+    color: #FFFFFF;
+    background-color: #2766be;
+    font-size: inherit;
+    font-family: inherit;
+    text-transform: lowercase;
+}
+
+.paginador .ubicacion:hover     {
+    background-color: #2a6ece;
+    cursor: pointer;
+}
+
+.paginador .control {
+    position: absolute;
+    top: 22px;
+    left: 0;
+    width: fit-content;
+    min-width: 100%;
+    max-height: 80px;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    overflow: auto;
+    font-size: .688rem;
+    font-weight: bold;
+    text-align: center;
+    background-color: #fff;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 5px 0 #8C8C8C;
+    z-index: 10;
+    outline: none;
+}
+/* Select del paginador */
+.paginador .control li {
+    padding: 3px 0;
+    color: #646464;
+    border-bottom: solid 1px #ddd;
+    background-color: #bfbfbf;
+    outline: none;
+    cursor: pointer;
+}
+.paginador .control li:hover { background-color: #EEE; }
+
+.paginador .control li.actual,
+.paginador .control li.actual:hover {
+    color: #595959;
+    border-bottom: 1px solid #eaeaea;
+    background-color: #FFF;
+}
+
+div.loading {
+    position: absolute;
+    top: 5px;
+    right: 0;
+    width: 20px;
+    height: 20px;
+    background: url(../img/comunes/spinner.gif) no-repeat;
+}
+/*-----------------------------------------------------------------------------------------------------*/

@@ -1,0 +1,1518 @@
+/********************************************************************************/
+/*                                                                              */
+/* Plataforma e-ducativa.  Version 14.05.00-109 - Argentina                     */
+/*                                                                              */
+/* Copyright (c)  de e-ducativa Educación Virtual S.A.                          */
+/*                                                                              */
+/********************************************************************************/
+/**
+ * Barra de funciones de vista de usuario
+ */
+Educativa.Aula.FunctionBar = Class.create( Educativa.FunctionBar , {
+
+    alerta_desactivo: function() {
+        alert("LOGIN_SUSPENDIDO".termcap());
+    } ,
+
+    get_descripcion_ubicacion: function(){
+        return this.descripcion_ubicacion;
+    } ,
+
+    get_url_logout: function(){
+        var id_curso_actual = this.id_curso != 0 ? this.id_curso : null;
+        return url_dir + 'acceso.cgi?wAccion=logoff&id_curso=' + id_curso_actual;
+    } ,
+
+    /**
+     * Renderiza el logo de la instalacion en la barra
+     * Depende de la configuracion a nivel curso
+     */
+    render_logo: function () {
+
+        if( ! this.user_logged ){
+            this.logo_install = this.logo_link_acceso();
+        } else if ( this.mostrar_link_escritorio && this.logout_multiple && ! this.es_usuario_anonimo() ) {
+            this.logo_install = this.logo_link_escritorio();
+        } else {
+            this.logo_install = this.logo_no_link()
+        }
+
+        this.frame.appendChild( this.logo_install );
+
+    },
+
+    /**
+     * Renderiza el nombre de la instalacion en la function bar
+     */
+    render_nombre_instalacion: function() {
+
+        let container = document.createElement('div');
+
+        if ( this.url_link_institucion ) {
+            container = document.createElement('a');
+            container.title = Dict.termcap(this.btn_dict);
+            container.href = this.url_link_institucion;
+            container.target = '_blank';
+        }
+        container.classList.add('nombre_instalacion','linea_unica');
+        container.innerHTML = this.label_logo();
+        this.link_nombre_instalacion = container;
+
+        this.function_bar.appendChild( this.link_nombre_instalacion );
+    },
+
+    /**
+     * Retorna el elemento img del logo del campus
+     *
+     * @return (Element)
+     */
+    logo_img_element: function() {
+        const img = document.createElement('img');
+
+        img.src = this.logo_principal;
+
+        return img;
+    },
+
+    /**
+     * Retorna el elemento de logo del campus que redirige a acceso.cgi
+     *
+     * @return (Element)
+     */
+    logo_link_acceso: function() {
+        const logo = document.createElement('a');
+
+        logo.title = Dict.termcap('ACCEDER_AL_CAMPUS');
+        logo.classList.add('logo');
+        logo.href = `${this.url_dir}acceso.cgi`;
+
+        logo.appendChild(this.logo_img_element());
+
+        return logo;
+    },
+
+    /**
+     * Retorna el elemento de logo del campus que redirige a escritorio.cgi
+     *
+     * @return (Element)
+     */
+    logo_link_escritorio: function() {
+        const logo = document.createElement('a');
+
+        logo.title = Dict.termcap('GRUPOS');
+        logo.classList.add('logo');
+        logo.href = `${this.url_dir}escritorio.cgi`;
+
+        if ( this.id_curso != 0 ) {
+            logo.href += `?id_curso_ant=${this.id_curso}`;
+        }
+
+        logo.appendChild(this.logo_img_element());
+
+        return logo;
+    },
+
+    /**
+     * Retorna el elemento de logo del campus sin redireccion
+     *
+     * @return (Element)
+     */
+    logo_no_link: function() {
+        const logo = document.createElement('span');
+
+        logo.appendChild(this.logo_img_element());
+        logo.classList.add('logo');
+
+        return logo;
+    },
+
+    label_logo: function(){
+        return this.nombre_instalacion;
+    },
+
+    render_img_usuario: function(){
+        if (!this.imgElementThumb) {
+            this.imgElementThumb = document.createElement('img');
+            this.imgElementThumb.classList.add('thumb');
+        }
+        this.imgElementThumb.src = this.url_thumb;
+
+        if (!this.usr_frame) {
+            this.usr_frame = document.createElement('div');
+            this.usr_frame.classList.add('usuario');
+
+            this.usr_frame.appendChild( this.imgElementThumb );
+
+            this.menu_usuario_frame.appendChild( this.usr_frame );
+        }
+
+    },
+
+    render_login_centralizado: function () {
+        const {user_logged, url_login_unico, cant_productos_lc} = this;
+        if( user_logged && url_login_unico && cant_productos_lc > 1 ){
+            var opcion = new Element( 'a', {
+                className: 'app',
+                title: Educativa.Dict.translate('CAMBIAR_DE_PRODUCTO'),
+                href: this.url_login_unico
+            } );
+
+            var iconoCentro = $('icono_centro_fa').innerHTML;
+            opcion.insert(iconoCentro);
+            opcion.insert( new Element( 'span', { className : "label" })
+                .update( Educativa.Dict.translate('CAMBIAR_DE_PRODUCTO') )
+            );
+
+            this.apps.insert( opcion );
+        }
+    },
+
+    render_link_perfil: function () {
+
+        let opcion = document.createElement('li');
+        opcion.classList.add('opcion_menu_usuario');
+
+        let usuario_link_perfil = document.createElement('a');
+        usuario_link_perfil.classList.add('Logout');
+        usuario_link_perfil.id = 'usuario_link_perfil';
+        usuario_link_perfil.innerHTML = Educativa.Dict.translate('PERFIL_Y_PREFERENCIAS').capitalize();
+
+        if (! this.es_usuario_anonimo()) {
+            let iframe = document.createElement('iframe');
+            iframe.classList.add('modal_iframe');
+            iframe.style.width = '100%';
+            iframe.style.height = '95%';
+            iframe.style.border = 0;
+            iframe.setAttribute('src', url_dir + 'personal.cgi');
+
+            usuario_link_perfil.onclick = this.show_modal_window.bind(this, iframe) ;
+        } else {
+            usuario_link_perfil.onclick = () => {
+                alert(Dict.termcap('ESTA_FUNCION_NO_ESTA_DISPONIBLE_PARA_USUARIOS_ANONIMOS'));
+            }
+        }
+
+        opcion.appendChild(usuario_link_perfil);
+        this.listado_opciones.appendChild( opcion );
+    },
+
+    render_qr: function () {
+        if( this.user_logged ){
+            var opcion = new Element( 'li', { className: 'opcion_menu_usuario', id: 'acceso_app' } );
+
+            var qr_module = new Element('div');
+            qr_module.insert( new Element('a').insert( Educativa.Dict.translate('QR_OPCION_MENU_DESPLEGABLE') ) );
+
+            opcion.insert( qr_module );
+            this.listado_opciones.insert( opcion );
+
+            this.qr = new Educativa.Aula.QR();
+
+            qr_module.observe( 'click', this.get_acceso_temporal.bind(this) );
+        }
+    },
+
+    get_acceso_temporal: function(){
+        this.qr.get_acceso_temporal();
+    },
+
+    render_apps_menu: function(){
+
+        this.apps_button = new Element( 'button', { type : 'button', className : 'apps_button' } );
+        this.apps_button.insert( new Element( 'i', { className : 'icono down fas fa-chevron-square-down' } ) );
+        this.apps_button.insert( new Element( 'i', { className : 'icono up far fa-chevron-square-up' } ) );
+        this.apps_button.insert( new Element( 'i', { className : 'mail_alert fas fa-circle '} ) );
+
+
+        this.apps_box.insert( this.apps_button );
+
+        this.apps_button.observe( 'click', this.onClickAppsBt.bind(this) );
+
+    },
+
+    onClickAppsBt: function(){
+        this.function_bar.toggleClassName('show_apps');
+    },
+
+    render_btn_drive: function () {
+        if( this.user_logged && this.drive ) {
+
+            var link_drive = new Element('a', {
+                className: 'app',
+                title    : Educativa.Dict.translate('DRV_DRIVE'),
+                href     : this.drive.url
+            });
+
+            var icono_drive = $('icono_drive_fa').innerHTML ;
+            link_drive.insert( icono_drive );
+            link_drive.insert( new Element( 'span', { className : 'label' } ).update( Educativa.Dict.translate('DRV_DRIVE') ) );
+
+            this.apps.insert( link_drive );
+        }
+    },
+
+    render_btn_ingresar: function () {
+        if ( ! this.es_usuario_anonimo() ) return;
+
+        let icon = document.createElement('i');
+        icon.classList.add('icono','fas','fa-user-circle');
+
+        let label = document.createElement('span');
+        label.classList.add('label');
+        label.innerHTML = Dict.termcap('INGRESAR');
+
+        let btn_ingresar = document.createElement('span');
+        btn_ingresar.classList.add('app');
+        btn_ingresar.onclick = this.cerrar_sesion.bind(this);
+        btn_ingresar.appendChild(icon);
+        btn_ingresar.appendChild(label);
+
+        this.apps.appendChild( btn_ingresar );
+
+    },
+
+    /**
+     * Renderiza el boton de ir a escritorio.
+     * Depende de la configuracion a nivel curso
+     */
+    render_btn_aulas: function () {
+
+        if ( ! this.user_logged || this.es_usuario_anonimo() ) {
+            return;
+        }
+
+        // En Catalogo, Portafolio y Escritorio no se contempla la configuracion
+        // de curso
+        if ( this.vista_general() && this.mostrar_link_escritorio ){
+            this.apps.insert( this.get_btn_aulas() );
+            return;
+        }
+
+        if ( ! ( this.mostrar_link_escritorio && this.logout_multiple ) ) {
+            return;
+        }
+
+        this.apps.insert( this.get_btn_aulas() );
+
+    },
+
+    render_btn_catalogo: function () {
+
+        if( this.es_usuario_anonimo() || ! this.catalogo ) return;
+        if(this.catalogo.es_privado && !this.user_logged ) return;
+
+        var link_cat = new Element('a', {
+            className: 'app',
+            title    : Educativa.Dict.translate('CTL_CATALOGO'),
+            href     : this.catalogo.url
+        });
+
+        var icono_catalogo = $('icono_catalogo_fa').innerHTML ;
+        link_cat.insert( icono_catalogo );
+        link_cat.insert( new Element ( 'span', { className : 'label' } ).update( Educativa.Dict.translate('CTL_CATALOGO') ) );
+
+        this.apps.insert( link_cat);
+
+    },
+
+    render_btn_mensajes_no_leidos: function () {
+        if( !this.user_logged || this.es_usuario_anonimo() ){
+            return;
+        }
+
+        var link_mssg = new Element('span', {
+            className: 'mensajes_link'
+        });
+
+        if(  this.hay_mensajes_no_leidos ) this.function_bar.addClassName( 'mail_alert_on' )
+
+        var icon_wrapper =  new Element('a',{
+            className: 'app ',
+            title    : Educativa.Dict.translate('MENSAJES_NO_LEIDOS')
+        })
+        .insert( new Element( 'i', { className : 'icono fas fa-envelope' } ) )
+        .insert( new Element( 'i', { className : 'mail_alert fas fa-circle' } ) )
+        .insert( new Element( 'span', { className : 'label' } ).update( Educativa.Dict.translate('MENSAJES_NO_LEIDOS') ) );
+
+
+        link_mssg.insert( icon_wrapper );
+
+        this.mssg_no_leidos_popup = new Element('div',{
+            className : "mensajes_popup",
+            id: "mensaje-no-leidos-popup"
+        });
+        this.mssg_no_leidos_popup.hide();
+        link_mssg.insert( this.mssg_no_leidos_popup  );
+
+        this.apps.insert( link_mssg);
+
+        icon_wrapper.observe('click',this.showMensajeNoLeidos.bindAsEventListener(this));
+    },
+
+
+    render_btn_administracion: function ($super) {
+        if( this.user_logged ){
+            $super();
+        }
+    },
+
+    render_btn_logout: function () {
+
+        let link_logout = document.createElement('a');
+        link_logout.classList.add('Logout');
+        link_logout.id = 'cerrado_sesion_aula';//id utilizado para ocultar opcion desde app
+        link_logout.href = 'javascript:;';
+        link_logout.innerHTML = Dict.termcap('SALIR');
+        link_logout.onclick = this.cerrar_sesion.bind(this);
+
+        let opcion = document.createElement('li');
+        opcion.classList.add('opcion_menu_usuario');
+        opcion.appendChild( link_logout );
+
+        this.listado_opciones.appendChild( opcion );
+
+    },
+
+    render_btn_remote_sessions: function () {
+        var opcion = new Element( 'li', { id: 'cerrar_sesiones_remotas', className: 'opcion_menu_usuario' } );
+
+        var link_logout = new Element('a', {
+            href: 'javascript:;'
+        }).update( Educativa.Dict.translate( 'CERRAR_SESIONES_REMOTAS' ).capitalize() );
+
+        opcion.insert( link_logout );
+        this.listado_opciones.insert( opcion );
+
+        link_logout.observe('click',function(){ this.finish_remote_sessions(); }.bind(this));
+    },
+
+    finish_remote_sessions: function () {
+        new Ajax.Request( url_dir + 'qr.cgi', {
+            parameters : { 'wAccion' : 'finish_remote_sessions' },
+            onSuccess: this.on_finish_remote_sessions.bind(this)
+        });
+    },
+
+    on_finish_remote_sessions: function () {
+        alert( 'CERRAR_SESIONES_REMOTAS_SUCCESS'.termcap() );
+        $('cerrar_sesiones_remotas').hide();
+    },
+
+    /**
+     * Este nombre se muestra dentro del menu de opciones cuando el usuario
+     * no visualiza el otro nombre (el renderizado por this.render_fullname_location())
+     * al scrolear la pantalla
+     */
+    render_nombre_usuario_element: function() {
+        if (!this.nombre_usuario_element) {
+            this.nombre_usuario_element = document.createElement('div');
+            this.nombre_usuario_element.classList.add('nombre_usuario', 'hidden');
+            this.nombre_usuario_element.id = 'username_listado_opciones';
+        }
+
+        this.nombre_usuario_element.innerHTML = this.get_nombre_usuario();
+    },
+
+    render_menu_usuario: function () {
+        this.render_nombre_usuario_element();
+        this.listado_opciones = document.createElement('ul');
+        this.listado_opciones.classList.add('listado_opciones');
+        this.render_link_perfil();
+        this.render_qr();
+        this.render_link_ayuda();
+        this.render_link_soporte();
+        if( this.sesiones_activas > 1 ){
+            this.render_btn_remote_sessions();
+        }
+        this.render_btn_ingresar();
+        this.render_btn_logout();
+
+        this.opciones_frame = document.createElement('div');
+        this.opciones_frame.classList.add('opciones_frame');
+        this.opciones_frame.style = 'display:none;';
+        this.opciones_frame.appendChild(this.nombre_usuario_element);
+        this.opciones_frame.appendChild(this.listado_opciones);
+
+        this.menu_usuario_frame = document.createElement('div');
+        this.menu_usuario_frame.classList.add('menu_usuario_frame');
+        this.menu_usuario_frame.appendChild(this.opciones_frame);
+        this.render_img_usuario();
+
+        this.menu_usuario_frame.onclick = this.showListadoMenuUsuario.bind(this);
+
+        this.col_derecha.appendChild( this.menu_usuario_frame );
+
+    },
+
+    render_btn_login: function() {
+
+
+        if( !this.catalogo.es_privado && !this.user_logged ){
+            let icon = document.createElement('i');
+            icon.classList.add('icono','fas','fa-user-circle');
+
+            let label = document.createElement('span');
+            label.classList.add('label');
+            label.innerHTML = Dict.termcap('INGRESAR');
+
+            this.inicio_sesion = document.createElement('a');
+            this.inicio_sesion.classList.add('app');
+            this.inicio_sesion.title = Dict.termcap('INGRESAR');
+            this.inicio_sesion.href = 'acceso.cgi';
+
+            this.inicio_sesion.appendChild(icon);
+            this.inicio_sesion.appendChild(label);
+
+        }
+
+        this.apps.appendChild(this.inicio_sesion);
+
+    },
+
+    /**
+     * Renderiza el combo de cursos en vista de usuario
+     * Depende de la configuracion a nivel curso
+     */
+    render_combo_cursos: function() {
+
+        if ( this.no_grupos || this.vista_general() ) {
+            return;
+        }
+
+        if ( this.cursos.length == 1 || ! this.logout_multiple || this.es_usuario_anonimo() ){
+            return;
+        }
+
+        let id_curso_actual = this.id_curso != 0 ? this.id_curso : null;
+        this.combo_cursos = document.createElement('select');
+        this.combo_cursos.id = 'selector';
+        this.combo_cursos.style.display = 'none';
+        this.combo_cursos.classList.add('select_combo_cursos');
+
+        const aulas =  this.cursos.map( aula => {
+            const [id_curso, nombre, activo] = aula;
+            return {
+                value: id_curso,
+                label: nombre,
+                selected: id_curso == id_curso_actual ? true: false,
+                activated: activo == 'A' ? true : false,
+            }
+        });
+
+        this.combo_cursos.addEventListener('change',
+            this.onChangeCombo.bind( this, id_curso_actual )
+        );
+
+        this.combo_cursos_frame = document.createElement('span');
+        this.combo_cursos_frame.classList.add('comboCursos-Frame');
+        this.combo_cursos_frame.appendChild(this.combo_cursos);
+
+        this.location_bar.appendChild(this.combo_cursos_frame);
+
+        this.dropdownSearchable = new DropdownSearchable( this.combo_cursos, {
+            itemSelectText: '',
+            searchFields: ['label'],
+            searchResultLimit: 50,
+            shouldSort: false,
+            noResultsText: Dict.termcap('NO_EXISTEN_RESULTADOS_BUSQUEDA'),
+            choices: aulas
+        });
+
+        this.dropdownSearchable.render();
+
+        this.combo_cursos_frame.hide();
+
+    },
+
+    /**
+     * Retorna true si no hay cursos definidos, lo que asume que se encuentra
+     * en Escritorio, Portafolio o Catalogo.
+     *
+     * @return     {boolean}  { description_of_the_return_value }
+     */
+    vista_general: function() {
+
+        if ( typeof this.cursos !== 'undefined' && this.cursos.length > 0 ) {
+            return false;
+        }
+
+        return true;
+    },
+
+    onChangeCombo: function( id_curso_actual ) {
+
+        if (this.edupress_admin_link) {
+            window.location = this.edupress_admin_links;
+            return;
+        }
+
+        // id_curso_actual contiene el valor seleccionado antes del change
+        var value = this.combo_cursos.getValue(); //valor seleccionado
+        if( !value ) return ;
+
+        // destructuring para curso_seleccionado sea el primer elemento de filter y no un array
+        let [curso_seleccionado] = this.cursos.filter( curso => curso[0] == value );
+
+        if( curso_seleccionado[2] == 'A' ) {
+            window.location.href = url_dir+'index.cgi?id_curso='+value+'&id_curso_ant='+id_curso_actual;
+            return;
+        }
+
+        this.alerta_desactivo();
+        this.dropdownSearchable.setChoiceByValue(id_curso_actual);
+
+    },
+
+    render_ubicacion: function(){
+
+        var ubicacion = this.get_descripcion_ubicacion();
+
+        if (this.no_grupos && !ubicacion ){
+            return;
+        }
+        var element =  '';
+
+        // this.no_grupos indica perfil y preferencias
+        if (    this.id_curso
+             && ! this.no_grupos
+             && this.mostrar_link_escritorio
+             && ! this.es_usuario_anonimo()
+        ){
+            if ( this.logout_multiple ){
+                var to_aula = new Element('a', {
+                    href: url_dir + 'escritorio.cgi?id_curso_ant=' + this.id_curso,
+                    className: 'ubicacion_frame'
+                });
+                var icono_flecha = new Element('i', {className: 'ubicacion_separador far fa-chevron-right '});
+            }
+            element = new Element('a', {
+                href: url_dir+'index.cgi?id_curso='+this.id_curso,
+                className: 'ubicacion_frame linea_unica', title : this.nombre_curso ? this.nombre_curso : ubicacion
+            });
+
+        }else{
+            element = new Element('span', {
+                className: 'ubicacion_frame linea_unica',
+                title : ubicacion
+            });
+
+            if ( this.nombre_curso ) {
+
+                let span_ubicacion = new Element('span', {}).update(ubicacion);
+                let icono_flecha = new Element('i', { className: 'ubicacion_separador far fa-chevron-right' });
+                let span_nombre_curso = new Element('span', {}).update(this.nombre_curso);
+
+                element.insert( span_ubicacion );
+                element.insert( icono_flecha );
+                element.insert( span_nombre_curso );
+            }
+        }
+
+        if(to_aula) {
+            to_aula.update('GRUPOS'.termcap());
+            this.location_bar.insert(to_aula);
+            this.location_bar.insert(icono_flecha);
+        }
+
+        if ( this.nombre_curso ) {
+            this.ubicacion_frame = element;
+        } else {
+            this.ubicacion_frame = element.update( ubicacion );
+        }
+
+        this.location_bar.insert( this.ubicacion_frame );
+
+    },
+
+    render_fullname_location: function(){
+        if (!this.spanElementFullname) {
+            this.spanElementFullname = document.createElement('span');
+            this.spanElementFullname.classList.add('user_fullname');
+            this.spanElementFullname.id = 'username_location_bar';
+            this.spanElementFullname.onclick = this.showListadoMenuUsuario.bind(this);
+            this.location_bar.appendChild(this.spanElementFullname);
+        }
+
+        this.spanElementFullname.innerHTML = this.get_nombre_usuario();
+    },
+
+    render_btn_change_curso: function(){
+
+        let usuario_anonimo = this.id_usuario == '_anonimo';
+        let mostrar_link = this.mostrar_link_escritorio && this.logout_multiple && ! usuario_anonimo;
+        // this.no_grupos indica perfil y preferencias
+        let hay_cursos = typeof this.cursos !== 'undefined' && this.cursos.length > 1 && ! this.no_grupos;
+
+        if (this.edupress_admin_link || (mostrar_link && hay_cursos) ) {
+
+            let icono = new Element('i', { className: 'icono fas fa-caret-down' });
+
+            this.change_curso = new Element('span',{
+                className: 'btn_change_curso view_name_curso'
+            }).insert(icono);
+
+            this.location_bar.insert(this.change_curso);
+
+            this.change_curso.observe('click', this.onClickChangeCurso.bindAsEventListener(this));
+
+        }
+
+    },
+
+    onClickChangeCurso: function(){
+        const view = this.change_curso.hasClassName('view_name_curso') ? 'name_curso' : 'combo_cursos';
+        let classname = '';
+
+        if( view == 'name_curso' ){
+            let cursos_max_width = this.ubicacion_frame.getWidth() + 'px';
+            this.ubicacion_frame.hide();
+            this.combo_cursos.setStyle({ 'max-width' : cursos_max_width, 'min-width': '40px'});
+            this.combo_cursos_frame.show();
+            classname = 'view_combo_cursos';
+        } else {
+            this.ubicacion_frame.show();
+            this.combo_cursos.hide();
+            this.combo_cursos_frame.hide();
+            classname = 'view_name_curso';
+        }
+
+        this.change_curso.removeClassName('view_'+view);
+        this.change_curso.addClassName(classname);
+
+    },
+
+    render_link_ayuda: function () {
+        const opcion = document.createElement('li');
+        opcion.classList.add('opcion_menu_usuario');
+
+        const usuario_link_ayuda = document.createElement('a');
+        usuario_link_ayuda.id = 'usuario_link_ayuda';
+        usuario_link_ayuda.classList.add('Logout');
+        usuario_link_ayuda.innerHTML = Dict.termcap('AYUDA');
+        usuario_link_ayuda.onclick = ( () => {
+            Educativa.popupAyuda({url: this.url_ayuda});
+        } );
+
+        opcion.appendChild(usuario_link_ayuda);
+        this.listado_opciones.appendChild( opcion );
+    },
+
+    render_link_soporte: function () {
+
+        var id_curso_actual = this.id_curso || 00;
+        var opcion = new Element( 'li', { className: 'opcion_menu_usuario' } );
+        var link_ref = "'"+this.url_dir+"mensajeria.cgi?id_curso="+id_curso_actual+"&mail_to_admin=1'";
+        var snd_arg = "'blank'";
+        var thd_arg = "'width=742px, height=600px, resizable=false, status=false'";
+        var on_click_link = 'javascript: window.open('+link_ref+','+snd_arg+','+thd_arg+')';
+        var usuario_link_soporte = new Element('a', {
+            href: '#',
+            onClick: on_click_link,
+            id: 'usuario_link_soporte',
+            className: 'Logout'
+        }).insert( Educativa.Dict.translate('CONTACTAR_AL_ADMINISTRADOR').capitalize() );
+
+        opcion.insert( usuario_link_soporte );
+        this.listado_opciones.insert( opcion );
+    },
+
+    render_scroll_btn : function() {
+        this.scroll_button = new Element('div', { id : 'scroll-to-top', className : 'scroll_top'  })
+            .insert( new Element( 'i', { className : 'icono fas fa-chevron-up' } ) );
+
+        // Cuando se esta viendo una eval proctorizada, debe hacerse lugar para el logo de proctorizer
+        if(this.in_proctorizer && this.scroll_button){
+            this.scroll_button.classList.add('in_proctorizer');
+        }
+
+        this.function_bar.insert( this.scroll_button );
+
+        this.scroll_button.observe('click', ( function() {
+            Effect.ScrollTo( $$('body')[0], { duration: 0.5 });
+        }).bindAsEventListener(this) );
+
+    },
+
+    toggleScrollBtn: function () {
+        if ( $(this.container).viewportOffset().top <= -200 ) {
+            this.scroll_button.addClassName('show');
+        } else {
+            this.scroll_button.removeClassName('show');
+        }
+    },
+
+    render_botonera: function(){
+
+        this.render_logo();
+        this.render_nombre_instalacion();
+
+        this.render_btn_aulas();
+        this.render_btn_catalogo();
+        this.render_btn_drive();
+        this.render_btn_mensajes_no_leidos();
+        this.render_login_centralizado();
+        this.render_btn_administracion();
+        this.render_apps_menu();
+
+        if( this.user_logged ){
+            this.render_menu_usuario();
+        }else{
+            this.render_btn_login();
+        }
+
+        // location bar
+        if( this.user_logged ){
+            this.frame.insert( this.location_bar = new Element('nav', { className: 'location_bar' }) );
+
+            this.render_ubicacion();
+            this.render_combo_cursos();
+            this.render_btn_change_curso();
+            this.render_fullname_location();
+        }
+
+        this.render_scroll_btn();
+
+        // IE HACK
+        Event.observe(window,'scroll', this.toggleScrollBtn.bindAsEventListener(this) );
+
+    },
+
+    showListadoMenuUsuario: function (e) {
+        if( Educativa.Aula.SimulandoPopup || this.in_proctorizer){
+            return;
+        }
+
+        e.cancelBubble = true;
+
+        if (this.opciones_frame.showing){
+            this.hideListadoMenuUsuario();
+            return false;
+        }
+
+        this.opciones_frame.show();
+        this.opciones_frame.showing = true;
+        this.opciones_frame.style.opacity = 1;
+        this.usr_frame.addClassName('activo');
+        this.frame.addClassName('user-options');
+
+        var descendentes = this.opciones_frame.descendants();
+        var bodyHandler = function (e,b) {
+            if ( descendentes.indexOf(e.target) < 0 ) {
+                this.hideListadoMenuUsuario(bodyHandler);
+            }
+        }.bind(this)
+        document.body.observe('click', bodyHandler );
+    },
+
+    hideListadoMenuUsuario: function (bodyHandler) {
+        if (bodyHandler){
+            document.body.stopObserving('click', bodyHandler );
+        }
+        if (this.opciones_frame.showing) {
+            this.opciones_frame.fade({duration:0.3});
+        }
+        this.usr_frame.removeClassName('activo');
+        this.frame.removeClassName('user-options');
+        this.opciones_frame.showing = false;
+    },
+
+    showMensajeNoLeidos: function (e) {
+        if( Educativa.Aula.SimulandoPopup ){
+            return;
+        }
+
+        e.cancelBubble = true;
+
+        if (this.mssg_no_leidos_popup.showing){
+            this.hideMensajeNoLeidos();
+            return false;
+        }
+
+        this.mssg_no_leidos_popup.show();
+        this.mssg_no_leidos_popup.showing = true;
+
+        if( !this.correo ){
+
+            var spinner = new Educativa.OverlayedSpinner({
+                over: this.mssg_no_leidos_popup,
+                transparent: true,
+                className: 'Correo',
+                take_zindex_over: true,
+            });
+
+            new Ajax.Request( url_dir+'mensajes_no_leidos.cgi', {
+                onSuccess: function(response) {
+                    try {
+                        var js_init = response.responseText.evalJSON();
+                    } catch ( e ){
+                        console.log('Error parseando JSON',e);
+                        alert('Error parseando JSON',e);
+                        spinner.remove();
+                    }
+
+                    js_init['container'] = this.mssg_no_leidos_popup;
+                    js_init['fbar'] = this;
+                    try {
+                        this.correo = new Educativa.Aula.MensajesNoLeidos(js_init);
+                    }catch(error){
+                        console.log('Error init', error);
+                        alert('Error inicializando mensajes no leidos');
+                        spinner.remove();
+                    }
+                    spinner.remove();
+                }.bind(this),
+
+                onFailure : function(response) {
+                    spinner.remove();
+                    console.log(response);
+                    alert('Error ajax al consultar mensaje no leidos');
+                }
+
+            });
+
+        }
+
+        this.mensajes_no_leidos_body_handler  = function ( ev ) {
+            if( ! this.mssg_no_leidos_popup.contains(ev.target) ){
+                this.hideMensajeNoLeidos();
+            }
+        }.bindAsEventListener(this);
+
+        document.body.observe('click', this.mensajes_no_leidos_body_handler );
+    },
+
+    hideMensajeNoLeidos: function () {
+        if(this.mensajes_no_leidos_body_handler){
+            document.body.stopObserving('click', this.mensajes_no_leidos_body_handler);
+        }
+        this.mssg_no_leidos_popup.fade({duration:0.3});
+        this.mssg_no_leidos_popup.showing = false;
+    },
+
+    show_modal_window: function (element) {
+        const modal_window = new Modal({
+            element: element,
+            classes: ['wrapper_size_large','wrapper_iframe'],
+            hideExitButton: true,
+            callbackOnExit: (modalInstance) => {
+                // Renderizamos nuevamente los elementos que pueden tener modificaciones
+                // luego de actualizar el perfil
+                this.render_fullname_location();
+                this.render_nombre_usuario_element();
+                this.render_img_usuario();
+            },
+        })
+
+        modal_window.add();
+
+    },
+
+    es_usuario_anonimo: function () {
+        return this.id_usuario == '_anonimo';
+    },
+
+
+    /**
+     * Retorna un elemento de boton para retornar a escritorio
+     */
+    get_btn_aulas: function () {
+
+        let link_href = this.url_dir + 'escritorio.cgi';
+
+        if( this.id_curso != 0 ){
+            link_href = this.url_dir + 'escritorio.cgi?id_curso_ant=' + this.id_curso;
+        }
+
+        let link_aula = document.createElement('a')
+        link_aula.classList.add('app');
+        link_aula.title = Dict.termcap('GRUPOS');
+        link_aula.href = link_href;
+
+        let label = document.createElement('span')
+        label.classList.add('label');
+        label.innerHTML = Dict.termcap('GRUPOS');
+
+        let icono_aulas = document.getElementById('icono_aulas_fa').innerHTML ;
+
+        link_aula.insertAdjacentHTML( 'beforeend', icono_aulas );
+        link_aula.appendChild( label );
+
+        return link_aula;
+    },
+
+    /**
+     * @typedef DataUsuarioArgs
+     * @type {object}
+     * @property {string} nombreCompleto - Apellido y nombre del usuario
+     * @property {string} urlThumb - Url a la foto de perfil
+     */
+
+    /**
+     * @method actualizarDatosUsuario
+     *
+     * @description Permite setear las props internas relacionada a los datos del usuario
+     * Estos luego para mostrarse pueden ejecutarse las funciones:
+     * - this.render_fullname_location()
+     * - this.render_nombre_usuario_element
+     * - this.render_img_usuario()
+     *
+     * @param {DataUsuarioArgs} Datos del usuarios que estan presente en la barra de funciones
+     */
+    actualizarDatosUsuario: function ({nombreCompleto, urlThumb}) {
+        if (urlThumb) {
+            this.url_thumb = urlThumb;
+        }
+
+        if (nombreCompleto) {
+            this.user_nombre_completo = nombreCompleto;
+        }
+    },
+
+});
+
+
+/***************************************
+ ****** ****** Modulo QR ****** ********
+ ***************************************/
+
+Educativa.Aula.QR = Class.create({
+
+    initialize: function(args) {
+
+        this.modal = new Educativa.Aula.Modal({
+            classname: 'qr',
+            close_hdlr: this.close_hdlr.bind(this)
+        });
+
+        this.modal.container.insert(
+            this.aclaracion = new Element('div', { className : 'desc' } ).insert(
+                Educativa.Dict.translate( 'QR_SCAN_DESCRIPCION' )
+            )
+        );
+
+        this.modal.container.insert(
+            this.qr_container = new Element( 'div', { className : 'qr_container' } )
+        );
+
+        this.showingQR = false;
+    },
+
+    // Handler para cerrado de ventana modal desde la interfaz de Educativa.Aula.Modal
+    close_hdlr: function() {
+        this.showingQR = false;
+    },
+
+	// Realiza llamada ajax a qr.cgi para generar un acceso temporal a qr.cgi para ser usado por la app al leer el codigo QR
+    get_acceso_temporal: function () {
+        var id_curso_actual = this.id_curso || 0;
+
+        var qr_params = {
+            'id_curso' : id_curso_actual,
+            'wAccion'  : 'get_qr_link',
+            'cgi'      : this.get_qr_fwd_link()
+        };
+
+        new Ajax.Request( url_dir + 'qr.cgi', {
+            parameters: qr_params,
+            onSuccess:  this.on_parse_qr_response.bind(this),
+        });
+    },
+
+    // Link al que se redirigira la app al loguerse mediante QR (url actual)
+    get_qr_fwd_link: function () {
+
+        if( Educativa.Aula.is_backend() ){
+            return 'escritorio.cgi';
+        }else{
+            var link;
+            var path_array = window.location.pathname.split( '/' );
+            var cgi = path_array[path_array.length - 1];
+
+            if( cgi ){
+                link = cgi + window.location.search;
+                return link;
+            }
+        }
+    },
+
+    on_parse_qr_response: function(response){
+        var link;
+        try {
+            var response_json = response.responseText.evalJSON();
+            if( response_json['data'] && response_json['data']['link'] ){
+                link = response_json['data']['link'];
+                this.temporal_access = response_json['data']['temporal_access'];
+            }
+        } catch ( e ){
+            console.log('Error parseando JSON',e);
+            return;
+        }
+
+        this.show_qr_code( link );
+    },
+
+    show_qr_code: function(link){
+
+        this.qr_container.update(
+            this.qr_data = new Element( 'div', { className : 'qr_data' } ).insert(
+                new Element( 'img', { className: 'qr_overlay' } )
+            )
+        );
+
+        var qr_ok = this.load_qr_code( link );
+
+        if( !qr_ok ){
+            return;
+        }
+
+        this.show_modal();
+    },
+
+    load_qr_code: function(link){
+        try {
+            this.qrcode = new QRCode( this.qr_data, {
+                text: link,
+                width: 300,
+                height: 300,
+                colorDark : "#000000",
+                colorLight : "#ffffff",
+                correctLevel : QRCode.CorrectLevel.H
+            });
+            return true;
+        } catch ( e ){
+            console.log('Error generando QR',e);
+            return false;
+        }
+    },
+
+    show_modal: function(){
+        this.showingQR = true;
+        this.modal.show();
+        this.show_update_qr.bind(this).delay(60);
+        this.check_app_login.bind(this).delay(5);
+    },
+
+    hide_modal: function(){
+        this.showingQR = false;
+        this.modal.hide();
+    },
+
+    // Handler del timeout de la ventana modal de QR
+    show_update_qr: function(){
+        this.showingQR = false;
+        this.qr_data.insert(
+            this.qr_update = new Element( 'div', { className : 'qr_update', title : 'QR_UPDATE_DESCRIPCION'.termcap() } ).insert(
+                new Element( 'i', { className : 'far fa-sync-alt icon' } )
+            )
+        );
+
+        this.qr_update.observe( 'click', this.get_acceso_temporal.bind(this) );
+    },
+
+    check_app_login: function(){
+        new Ajax.Request( url_dir + 'qr.cgi', {
+            parameters: { 'wAccion' : 'check_app_login', 'temporal_access' : this.temporal_access },
+            onSuccess:  this.on_parse_check_app_login.bind(this),
+        });
+    },
+
+    on_parse_check_app_login: function(response){
+        var link;
+        try {
+            var response_json = response.responseText.evalJSON();
+            if( this.showingQR ){
+                if( response_json['data'] && response_json['data']['logged'] ){
+                    this.hide_modal();
+                }else{
+                    this.check_app_login.bind(this).delay(5);
+                }
+            }
+        } catch ( e ){
+            console.log('Error parseando JSON',e);
+            return;
+        }
+    },
+
+});
+
+Educativa.Aula.Backend = {};
+/**
+ * Clase que hereda de la barra usada en vista de usuario
+ * para utilizar en Backend
+ *
+ * Se redefinen los metodos que tengan comportamientos diferentes
+ * en la Administracion
+ */
+Educativa.Aula.Backend.FunctionBar = Class.create( Educativa.Aula.FunctionBar , {
+
+    render_combo_cursos: function() {
+
+        let link_edupress = this.edupress_admin_link;
+
+        if( ! link_edupress ){
+            return;
+        }
+
+        this.combo_cursos = document.createElement('select');
+        this.combo_cursos.id = 'selector';
+        this.combo_cursos.style.display = 'none';
+        this.combo_cursos.classList.add('select_combo_cursos');
+
+        const combo_options = [
+            {
+                value: 0,
+                label: this.get_descripcion_ubicacion(),
+                selected: true,
+                activated: true,
+            },
+            {
+                value: 1,
+                label: this.edupress_admin_text,
+                selected: false,
+                activated: true,
+            },
+        ]
+
+        // Se esta ignorando el contenido del combo, porque en este caso solo
+        // puede haber dos opciones, y cambiar de opcion implica ir a edupress
+        this.combo_cursos.addEventListener('change', () => {
+            window.location = link_edupress;
+        })
+
+        this.combo_cursos_frame = document.createElement('span');
+        this.combo_cursos_frame.classList.add('comboCursos-Frame');
+
+        this.combo_cursos_frame.appendChild( this.combo_cursos );
+        this.location_bar.appendChild( this.combo_cursos_frame );
+
+        this.dropdownSearchable = new DropdownSearchable( this.combo_cursos, {
+            itemSelectText: "",
+            searchEnabled: false,
+            shouldSort: false,
+            noResultsText: Dict.termcap('NO_EXISTEN_RESULTADOS_BUSQUEDA'),
+            choices: combo_options
+
+        });
+
+        this.dropdownSearchable.render();
+
+        this.combo_cursos_frame.hide();
+
+    },
+
+    /**
+     * Renderiza el boton de ir a escritorio.
+     * Depende de la configuracion a nivel campus
+     */
+    render_btn_aulas: function () {
+
+        if ( ! this.user_logged || this.es_usuario_anonimo() ) {
+            return;
+        }
+
+        if ( ! this.mostrar_link_escritorio ) {
+            return;
+        }
+
+        this.apps.insert( this.get_btn_aulas() );
+
+    },
+
+    /**
+     * Renderiza el logo de la instalacion en la barra
+     * Depende de la configuracion a nivel campus
+     */
+    render_logo: function () {
+
+        if( ! this.user_logged ){
+            this.logo_install = this.logo_link_acceso();
+        } else if ( this.mostrar_link_escritorio && ! this.es_usuario_anonimo() ) {
+            this.logo_install = this.logo_link_escritorio();
+        } else {
+            this.logo_install = this.logo_no_link()
+        }
+
+        this.frame.appendChild( this.logo_install );
+
+    },
+
+});
+
+
+
+/*******************************************
+ ****** ****** Modulo Correo ****** ********
+ *******************************************/
+
+
+Educativa.Aula.MensajesNoLeidos = Class.create({
+    id_abr: 'MC',
+    id: 'Correo',
+    className: 'mensajes_function',
+    lock: false,
+
+
+    initialize: function(args){
+
+        this.callback = args.callback;
+        Object.extend( this, args);
+
+        // Usado para calcular los dias transcurridos desde el envio de mail
+        var hoy = new Date();
+        this.mil_hoy = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate()).getTime();
+
+        this.order_option = {};
+        this.cursos_option = {};
+        this.title = 'CORREO_NO_LEIDO'.termcap();
+
+        this.headers = [
+            { id    : 'fecha',
+              tipo  : 'date',
+              sort  : 1,
+              nombre : 'FECHA'.term().capitalize()
+            },
+            { id    : 'asunto',
+              tipo  : 'string',
+              sort  : 1,
+              nombre : 'ASUNTO'.term().capitalize()
+            },
+            { id    : 'remitente',
+              tipo  : 'string',
+              sort  : 1,
+              nombre : 'REMITENTE'.term().capitalize()
+            },
+            { id    : 'grupo',
+              tipo  : 'string',
+              sort  : 1,
+              nombre : 'GRUPO'.term().capitalize()
+            }
+        ];
+
+        // Paginador
+        this.pg = new Educativa.Paginador({
+            id: 'pg_'+this.id_abr,
+            source_url: url_dir+'mensajes_no_leidos.cgi',
+            source_params: {
+                wAccion : 'modulo_correo'
+            },
+            page_size: this.page_size,
+            total_registros: this.total_registros,
+            headers: this.headers,
+            order: this.order,
+            order_asc: this.order_asc,
+            filter: this.filter,
+            keywords: this.keywords
+        });
+
+        this.pg.observe('beforeUpdate', this.onBeforeUpdatePaginado.bind(this));
+        this.pg.observe('update', this.onUpdatePaginado.bind(this));
+
+        this.createMenuBox();
+        this.container.insert( this.box );
+
+        // layout basico
+        this.box_body.insert( this.correos_container   = new Element('div') );
+        this.box_footer.insert( this.paginador_container = new Element('div') );
+
+        // Vistas del paginador
+        this.renderPaginador();
+
+        this.pg.setPagina({
+              total_registros: this.total_registros,
+              page: 1,
+              order : this.order,
+              order_asc : this.order_asc,
+              filter : this.filter,
+              keywords : this.keywords
+            },
+            this.items
+        );
+
+    },
+
+
+    onBeforeUpdatePaginado: function(){
+        this.lock = true;
+        //muestra spinner
+        if( !this.box_body.hasClassName('el_loading') ){
+            this.box_body.addClassName('el_loading');
+        }
+    },
+
+    onUpdatePaginado: function(){
+        //oculta spinner
+        if( this.box_body.hasClassName('el_loading') ){
+            this.box_body.removeClassName('el_loading');
+        }
+        this.items = this.pg.getData();
+
+        if (this.items.length == 0) {
+            this.sinCorreos();
+            this.lock = false;
+            return;
+        }
+
+        this.updateMainBody();
+
+        this.lock = false;
+    },
+
+    sinCorreos: function() {
+
+        var term = "NO_EXISTEN_MENSAJES_NO_LEIDOS";
+        var mensaje_vacio = new Element('div', { className : 'seccion_vacia' }).insert( term.termcap() );
+
+        this.correos_container.update(mensaje_vacio);
+    },
+
+    updateMainBody: function(){
+        var ul = new Element('ul', {className: 'lista_mensajes'});
+
+        for( var i=0; i < this.items.length; ++i ){
+            var item = this.items[i];
+
+            var fecha = Educativa.Utils.parseDate(item.fecha);
+            var texto_fecha = this.formatDate(fecha).capitalize();
+
+            ul.insert(
+                new Element( 'li' ).insert(
+                    new Element('a', {
+                        href: url_dir+'webmail.cgi?wAccion=VerEmail&wIdBandeja=Inbox&wIdEmail='+
+                              item.id+'&id_curso='+item.id_curso
+                    })
+                        .insert( new Element('div', { className: 'subject linea_unica' })
+                            .update( item.asunto)
+                            .insert( { top : item.adjunto ? new Element('i', { className: 'fal fa-paperclip adjunto'}) : '' } )
+                        )
+                        .insert( new Element( 'div', { className : 'linea_unica' } )
+                            .insert( new Element('span', { className: 'from' }).insert( item.nombre ) )
+                            .insert( new Element('span', { className: 'aula'}).update( ' - ' + item.nombre_curso.escapeHTML()) )
+                        )
+                        .insert( new Element( 'div', { className : 'date linea_unica' } ).update(texto_fecha) )
+                )
+            );
+        }
+
+        this.correos_container.update(ul);
+
+    },
+
+    renderPaginador: function() {
+        this.pg_view = new Educativa.Paginador.Vista({
+            paginador: this.pg,
+            target: this.id+'-pg',
+            resumen_pie_txt: 'CANT_MENSAJES'.term(),
+            resumen_pie_txt_singular: 'CANT_MENSAJE'.term()
+        });
+        this.paginador_container.insert( this.pg_view.renderPageControl('reducido') );
+
+    },
+
+    createMenuBox: function(){
+
+        this.box_header = new Element('header').insert( new Element('h2').update(this.title) );
+
+        this.cerrar = new Element( 'button', { type : 'button', className : 'cerrar_bt' } );
+        this.cerrar.insert( new Element( 'i', { className : 'cerrar fas fa-times' } ) );
+
+        this.cerrar.observe('click',this.fbar.hideMensajeNoLeidos.bindAsEventListener(this.fbar));
+
+        this.box_header.insert( this.cerrar );
+
+        this.box = new Element('section',{
+                className: this.className,
+                id : this.id
+            })
+            .insert( this.box_header )
+            .insert( this.box_body   = new Element('div', {className: 'body'} ) )
+            .insert( this.box_footer = new Element('footer') )
+        ;
+
+    },
+
+    formatDate: function(fecha) {
+
+        var mil_fecha = new Date(fecha.getFullYear(), fecha.getMonth(), fecha.getDate()).getTime();
+        var dif = (this.mil_hoy - mil_fecha)/(1000*60*60*24);
+
+        var show_anio = new Date().getFullYear() != fecha.getFullYear();
+
+        if (dif < 1) {
+            return 'HOY'.term().toLowerCase() + ', ' + Educativa.Utils.dateFormatTime(fecha) + ' hs';
+        } else if (dif >= 1 && dif < 2) {
+            return 'AYER'.term() + ', ' + Educativa.Utils.dateFormatTime(fecha) + ' hs';
+        } else {
+            var termino = '';
+            var values = {
+                dia : fecha.getDate(),
+                mes : Educativa.Utils.dateFormatMonthName(fecha),
+                hora: Educativa.Utils.dateFormatTime(fecha)
+            }
+
+            if ( show_anio ){
+                termino = 'DIA_DE_MES_DE_ANIO_HORA';
+                values.anio = fecha.getFullYear();
+            }else{
+                termino = 'DIA_DE_MES_HORA';
+            }
+
+            return termino.term().interpolate( values )
+        }
+    }
+
+});
+
+// ocultar la function_bar y el hamb-menu cuando se superan los 200px de scroll
+// y reaparecer cuando el usuario vuelve a scrollear hacia arriba
+document.addEventListener("DOMContentLoaded", function(){
+
+    // no es necesario acciones si no esta la function bar
+    if( ! $('function_bar') ) return;
+
+    let previousScroll = 0;
+
+    Event.observe(window, "scroll", function() {
+        let currentScroll = document.body.cumulativeScrollOffset().top;
+        let isDown = ( currentScroll > previousScroll ) && currentScroll > 200;
+
+        let function_bar              = document.getElementById('function_bar');
+        let hamb_menu_wrapper         = document.getElementById('hamb-menu-wrapper');
+        let username_listado_opciones = document.getElementById('username_listado_opciones');
+        let username_location_bar     = document.getElementById('username_location_bar');
+
+        if( isDown && ! function_bar.classList.contains('scrolled') ){
+
+            // Para secciones donde no esta el hamb-menu
+            if( hamb_menu_wrapper && ! hamb_menu_wrapper.classList.contains('scrolled') ){
+                hamb_menu_wrapper.classList.add('scrolled');
+            }
+
+            function_bar.classList.add('scrolled');
+
+            // Se chequea si existe, debido a que el elemento no existe
+            // en catalogo cuando un usuario no esta logueado
+            if( username_listado_opciones ){
+                username_listado_opciones.classList.remove('hidden');
+                username_location_bar.classList.add('hidden');
+            }
+
+        }else if( !isDown ){
+
+            if( hamb_menu_wrapper ){
+                hamb_menu_wrapper.classList.remove('scrolled');
+            }
+
+            function_bar.classList.remove('scrolled');
+
+            if( username_listado_opciones ){
+                username_listado_opciones.classList.add('hidden');
+                username_location_bar.classList.remove('hidden');
+            }
+        }
+
+        // actualizamos scroll
+        previousScroll = currentScroll;
+
+    });
+
+});

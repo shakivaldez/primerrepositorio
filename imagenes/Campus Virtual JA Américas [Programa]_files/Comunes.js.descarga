@@ -1,0 +1,808 @@
+/********************************************************************************/
+/*                                                                              */
+/* Plataforma e-ducativa.  Version 14.05.00-109 - Argentina                     */
+/*                                                                              */
+/* Copyright (c)  de e-ducativa Educación Virtual S.A.                          */
+/*                                                                              */
+/********************************************************************************/
+
+/**
+ * Objeto para manejar terminos desde javascript
+ * Este medio se provee como una alternativa a Educativa.Dict de Base.js
+ *
+ * @class Dict
+ */
+const Dict = {
+    /**
+     * @lends Dict
+     *
+     * @param {Object} args             Object que contiene los terminos y sus traducciones
+     * @param {String} args[termino]    Traduccion del termino
+     */
+    set_dicc: function( args ) {
+        this.terms = args;
+    },
+
+    /**
+     * Retorna la traduccion del termino que se pasa como parametro
+     *
+     * @method term
+     *
+     * @param  {String} t  Id del termino de diccionario
+     *
+     * @return {String}  El termino traducido
+     */
+    term: function(t) {
+        return Dict.terms[t] ? Dict.terms[t] : '*' + t + '*';
+    },
+
+    /**
+     * Retorna la traduccion del termino capitalizada
+     *
+     * @method termcap
+     *
+     * @param  {String} t  Id del termino de diccionario
+     *
+     * @return {String}  El termino traducido capitalizado
+     */
+    termcap: function(t) {
+        return this.term(t).charAt(0).toUpperCase() + this.term(t).slice(1).toLowerCase();
+    },
+
+    /**
+     * Retorna la traduccion del termino en minusculas
+     *
+     * @method termlc
+     *
+     * @param  {String} t  Id del termino de diccionario
+     *
+     * @return {String}  El termino traducido en lower case
+     */
+    termlc: function(t) {
+        return this.term(t).toLowerCase();
+    },
+
+    /**
+     * Retorna la traduccion del termino en mayusculas
+     *
+     * @method termuc
+     *
+     * @param  {String} t  Id del termino de diccionario
+     *
+     * @return {String}  El termino traducido en upper case
+     */
+    termuc: function(t) {
+        return this.term(t).toUpperCase();
+    },
+
+    /**
+     * Retornar el string original reemplazando los placeholders por los valores correspondientes
+     *
+     * @method interpolate
+     *
+     * @param {string}  term                    String con placeholders a reemplazar
+     * @param {Object}  placeholders            Object con los valores de los placeholders
+     * @param {string}  placeholders[nombre]    Texto que reemplaza el placeholder
+     *
+     * @returns {string}  El string original luego de los reemplazos
+     */
+    interpolate: function(term, placeholders) {
+        Object.keys( placeholders ).forEach( ph => {
+            var substr = new RegExp("#\{"+ph+"\}", "g");
+            term = term.replace(substr, placeholders[ph]);
+        });
+        return term;
+    }
+
+};
+
+/**
+ * Objeto que permite descargar archivos desde javascript
+ *
+ * @class Downloader
+ */
+const Downloader = {
+
+    /**
+     * Descarga el archivo indicado a traves de downloader.cgi
+     *
+     * @param {string} tipo         Tipo de descarga, de acuerdo a esto se arma la url
+     * @param {string} filename     Nombre del archivo a descargar
+     */
+    download: function(tipo, filename) {
+        var a = document.createElement('a');
+        var urls = {
+            conversacion_chat: 'comunes/downloader.cgi?tipo=conversacion_chat&filename=' + filename,
+        }
+        var url = urls[ tipo ];
+        a.href = url;
+        document.body.append(a);
+        a.click();
+        a.remove();
+    }
+
+};
+
+/*
+ * Objeto que permite mostrar el preview de una imagen en distintos tipos de elementos
+ * No se verifica si el archivo que llega es o no valido ya que esto depende del lugar en que se este utilizando
+ * por lo tanto dicha validacion se debe realizar antes de llamar a la funcion preview que es la encargada seleccionar
+ * la funcion correspondiente en base al tipo de elemento en donde se va a mostrar la imagen
+ *
+ */
+const ImagePreview = {
+
+    /**
+     * @public
+     * @method preview()
+     *
+     * @param {string}   type   Tipo de elemento en el que se va a mostrar la imagen
+     * @param {string}   id     Id del elemento
+     * @param {File}     file   Archivo proveniente de un input file
+     *
+     */
+    preview: function({type, id, file}) {
+        const img = URL.createObjectURL(file);
+        const elements = {
+            span: (id, img) => this.span(id, img),
+        };
+
+        elements[type](id, img);
+    },
+
+    /**
+     * Muestra el preview de la imagen en un <span>
+     *
+     * @private
+     * @method span()
+     *
+     * @param {string} id   Id del span
+     * @param {string} img  Imagen en base64
+     *
+     */
+    span: function(id, img) {
+        document.getElementById(id).setAttribute('style', `background-image: url(${img});`);
+    }
+}
+
+/*
+El espacio de color YIQ, utilizado por el sistema NTSC esta destinado a aprovechar
+las caracteristicas humanas de respuesta de color.
+Pasamos (convertimos) del modelo de color RGB, al espacio YIQ de manera aproximada.
+El componente Y representa la informacion de luminancia. I significa en fase,
+mientras que Q significa cuadratura. I y Q representan la informacion de crominancia
+Esta ecuacion tiene en cuenta el peso del valor rojo y determina que el tono es
+lo suficientemente oscuro para que el texto blanco muestre el mayor contraste.
+Mas info: https://www.wiki.es-es.nina.az/YIQ.html
+ */
+const calculateContrast = function(hex_color_code) {
+    hex_color_code = hex_color_code.replace('#', '');
+    const r = parseInt(hex_color_code.substr(0,2),16);
+    const g = parseInt(hex_color_code.substr(2,2),16);
+    const b = parseInt(hex_color_code.substr(4,2),16);
+    const yiq = ((r*299)+(g*587)+(b*114))/1000;
+
+    return (yiq >= 128) ? '#000000' : '#FFFFFF';
+}
+
+/**
+ * Objeto para mostrar contenidos en ventanas modales.
+ *
+ * No se ejecuta ningun metodo al instanciar.
+ *
+ * @param {element} obj.element             Elemento para mostrar como ventana modal.
+ * @param {array}   obj.classes             Clases css aplicadas al wrapper del modal.
+ *                                          Default sizes en objetos_comunes.
+ *                                          Determina las dimensiones del modal.
+ * @param {boolean} obj.exitHides           En true, el modal se oculta al presionar la X.
+ *                                          Por default se elimina el elemento.
+ * @param {function} obj.callbackOnExit     Funcion que se ejecuta al presionar la X
+ *
+ * @return {object}
+*/
+class Modal {
+
+    constructor({element, classes, exitHides, callbackOnExit}) {
+
+        this.modal = document.createElement('div');
+        this.modal.classList.add('modal_window');
+
+        this.modalWrapper = document.createElement('div');
+        this.modalWrapper.classList.add('modal_wrapper', ...classes);
+
+        this.exitButton = document.createElement('button');
+        this.exitButton.classList.add('modal_exit_button');
+        this.exitButton.type = 'button';
+        this.exitButton.innerHTML = '<i class="fa fa-times"></i>';
+
+        if(exitHides){
+            this.exitButton.onclick = () => {
+                this.hide();
+                if(callbackOnExit) { callbackOnExit(this) }
+            };
+        }else{
+            this.exitButton.onclick = () => {
+                this.remove();
+                if(callbackOnExit) { callbackOnExit(this) }
+            };
+        }
+
+        this.modalWrapper.appendChild(element);
+        this.modal.appendChild(this.exitButton);
+        this.modal.appendChild(this.modalWrapper);
+    }
+
+    add() {
+        this.disableBodyScroll();
+        document.body.appendChild(this.modal);
+    }
+
+    remove() {
+        this.enableBodyScroll();
+        document.body.removeChild(this.modal);
+    }
+
+    show() {
+        this.disableBodyScroll();
+        this.modal.style.display = '';
+    }
+
+    hide() {
+        this.enableBodyScroll();
+        this.modal.style.display = 'none';
+    }
+
+    enableBodyScroll() {
+        document.body.style.overflow = '';
+    }
+
+    disableBodyScroll() {
+        document.body.style.overflow = 'hidden';
+    }
+
+    getWrapper() {
+        return this.modalWrapper;
+    }
+
+}
+
+/**
+ * Objeto para mostrar un spinner sobre un elemento contenedor.
+ *
+ * No se ejecuta ningun metodo al instanciar.
+ *
+ * No funciona sobre elementos con position absolute o fixed.
+ *
+ * @param {HTMLElement} element     Elemento a cubrir con el spinner.
+ * @param {array}       classes     Array con las clases que se quieran agregar
+ * @param {string}      size
+ *
+*/
+class Spinner {
+
+    constructor({element, classes, size = 'xs'}) {
+
+        const sizes = {
+            xs: '',
+            sm: 'fa-2x',
+            md: 'fa-3x',
+            lg: 'fa-4x'
+        };
+
+        this.container = element;
+        this.originalPosition = this.container.style.position;
+
+        this.spinner = document.createElement('div');
+        this.spinner.classList.add('center_spinner');
+
+        this.spinner.innerHTML = `<i class="fal fa-spinner-third fa-spin fast-spin ${sizes[size]}"></i>`;
+
+        if (classes) this.spinner.classList.add(...classes);
+    }
+
+    add() {
+        this.setContainer();
+        this.container.appendChild(this.spinner);
+    }
+
+    remove() {
+        this.resetContainer();
+        this.container.removeChild(this.spinner);
+    }
+
+    show() {
+        this.setContainer();
+        this.spinner.style.display = '';
+    }
+
+    hide() {
+        this.resetContainer();
+        this.spinner.style.display = 'none';
+    }
+
+    setContainer() {
+        this.container.style.position = 'relative';
+    }
+
+    resetContainer() {
+        this.container.style.position = this.originalPosition;
+    }
+}
+
+class Dropper {
+
+    /**
+     * Arma un contenedor dropeable para poder arrastrar y soltar archivos
+     *
+     * @method     constructor
+     *
+     * @param      {Element}   options.elementContainerDropArea     Contenedor donde se va a renderizar los
+     *                                                              divs armados - listado de items y contenedor dropeable
+     * @param      {Object}    options.classes                      Cada key es un array. Keys: onDragEnter, onDragLeave,
+     *                                                              onDrop y extrasForContainer
+     * @param      {Object}    options.events                       Cada key debe ser una referencia a una funcion. Funciones permitidas:
+     *                                                              onDragEnter, onDragLeave, onDrop y onInputFileChange
+     * @param      {Element}   options.inputFile                    Elemento input type="file" que se relaciona con este contenedor
+     * @param      {Object}    options.data                         Datos para el manejo de los comportamientos
+     *
+     * @param      {Integer}   options.data.limitItems              Limite de items que se pueden soltar en el contenedor dropeable. Default: 0 (sin limite).
+     * @param      {Integer}   options.data.throwErrorOnLimitPass   Decide si debe llamarse o no a _throwErrorOnLimitPass si hay mas archivos cargados que el maximo permitido. Default: 1 (se debe llama a _throwErrorOnLimitPass)
+     * @param      {Array}     options.data.items                   Cada elemento es un objeto.
+     *
+     * @return     {Dropper}    Esta clase
+     */
+    constructor({ elementContainerDropArea, classes, events, inputFile, data }) {
+        this.elements = { containerDropArea: elementContainerDropArea };
+
+        // Clases defaults
+        this.classes = {
+            _onDragEnter: ['is_dragenter'],
+            _onDragOver:  ['is_dragenter'],
+            _onDragLeave: [],
+            _onDrop:      []
+        };
+        this.classes.onDragEnter = [ ...this.classes._onDragEnter ];
+        this.classes.onDragOver  = [ ...this.classes._onDragOver  ];
+        this.classes.onDragLeave = [ ...this.classes._onDragLeave ];
+        this.classes.onDrop      = [ ...this.classes._onDrop ];
+
+        this.getContainerDropArea().classList.add('container_drop_area');
+
+        // Si llegan clases por parametros, se agregan
+        if (classes) {
+            if (classes['onDragEnter']) { this.classes.onDragEnter.push(...classes['onDragEnter']); }
+
+            if (classes['onDragLeave']) { this.classes.onDragLeave.push(...classes['onDragLeave']); }
+
+            if (classes['onDrop'])      { this.classes.onDrop.push(...classes['onDrop']); }
+
+            if (classes['extrasForContainer']) {
+                this.getContainerDropArea().classList.add(...classes['extrasForContainer']);
+            }
+        }
+
+        this.events = { ...events };
+        this.elements.inputFile = inputFile;
+        this.data = {
+            limitItems: 0,
+            items: [],
+            itemsCount: 0,
+            throwErrorOnLimitPass: 1,
+            ...data
+        };
+
+        if (inputFile) {
+            this.getElementInputFile().addEventListener('change', this._onInputFileChange.bind(this));
+        }
+    }
+
+    getContainerDropArea() {
+        return this.elements.containerDropArea;
+    }
+
+    getElementDropArea() {
+        return this.elements.dropArea;
+    }
+
+    getElementListItems() {
+        return this.elements.listItems;
+    }
+
+    getElementInputFile() {
+        return this.elements.inputFile;
+    }
+
+    /**
+     * Arma la estructura de un contenedor dropper.
+     *
+     * @method     render
+     *
+     * @note Estructura:
+     * <div class="container_drop_area">
+     *     <div class="list_items">
+     *         Ver this.renderItem()
+     *     </div>
+     *     <div class="drop_area">
+     *         <div class="upload_bt">
+     *             <i class="fas fa-arrow-alt-up upload_icon"></i>
+     *         </div>
+     *         <div class="info_drop">
+     *             [TEXTO_INFO] <a class="link_search">[TEXTO_BUSQUELO]</a>
+     *         </div>
+     *     </div>
+     * </div>
+     */
+    render() {
+        const divIcon = document.createElement('div');
+        const spanInfo = document.createElement('span');
+        const linkSearch = document.createElement('a');
+        const icon = document.createElement('i');
+
+        const self = this;
+
+        // Datos div icon
+        icon.classList.add('fas', 'fa-arrow-alt-up', 'upload_icon');
+
+        divIcon.classList.add('upload_bt');
+        divIcon.title = Dict.termcap('DROPPER_BUSQUELO');
+        divIcon.appendChild(icon);
+        divIcon.addEventListener('click', (event) => {
+            self.getElementInputFile().click();
+        });
+
+        // Datos div info_drop
+        spanInfo.innerHTML = `${Dict.termcap('DROPPER_ARRASTRE_Y_SUELTE_AQUI_O')} `;
+
+        linkSearch.classList.add('link_search');
+        linkSearch.innerHTML = Dict.termlc('DROPPER_BUSQUELO');
+        linkSearch.addEventListener('click', () => { self.getElementInputFile().click(); });
+
+        spanInfo.classList.add('info_drop');
+        spanInfo.appendChild(linkSearch);
+
+        const divListItems = document.createElement('div');
+        divListItems.classList.add('list_items');
+
+        const divDropArea = document.createElement('div');
+        divDropArea.classList.add('drop_area');
+
+        // Agregamos los dos divs al drop area
+        divDropArea.appendChild(divIcon);
+        divDropArea.appendChild(spanInfo);
+
+        // Agregamos los divs al container drop area (list items y drop area)
+        this.getContainerDropArea().appendChild(divDropArea);
+        this.getContainerDropArea().appendChild(divListItems);
+
+        this.elements.dropArea  = divDropArea;
+        this.elements.listItems = divListItems;
+
+
+        // Determinar si armamos la lista de items y la mostramos
+        this.hideListItems();
+        if (this.data.items.length) {
+            this.data.items.map((dataItem, index) => {
+                this.renderItem({
+                    item: {
+                        ...dataItem,
+                        index,
+                        description: this._formatDescriptionFile({ ...dataItem })
+                    }
+                });
+            });
+            this.showListItems();
+        }
+
+        // Determinar si ocultamos el drop area
+        if (!this.isAllowAddItems()) { this.hideDropArea(); }
+
+        // Deshabilitamos el comportamiento por default de los eventos, para poder tener un mejor control.
+        ['drag', 'dragenter', 'dragover', 'dragleave', 'drop', 'dragstart'].map((e) => {
+            self.getElementDropArea().addEventListener( e, (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+            });
+        }, this );
+
+        this.getElementDropArea().addEventListener('dragenter', this._onDragEnter.bind(this));
+        this.getElementDropArea().addEventListener('dragover',  this._onDragOver.bind(this));
+        this.getElementDropArea().addEventListener('dragleave', this._onDragLeave.bind(this));
+        this.getElementDropArea().addEventListener('drop',      this._onDrop.bind(this));
+    }
+
+    /**
+     * Arma la estructura de un item para el contenedor this.getElementListItems();
+     *
+     * @method     renderItem
+     *
+     * @note Estructura que iria dentro del div <div class="list_items"></div>:
+     * <div class="item">
+     *     <i class="[CLASES_ICONO]"></i> o bien <img></img>
+     *     <div class="file_description">[DESCRIPCION_ITEM (HTML)]</div>
+     *     <button class="btn_delete" title="[TEXTO_ELIMINAR]"><i class="fas fa-"></i></button>
+     * </div>
+     *
+     *
+     * @param      {Object}       options.item              Objeto con los datos para el item
+     *
+     * @param      {String}       options.item.urlLink      Si llega, el archivo se puede abrir en otra ventana
+     * @param      {HTML}         options.item.description  Puede ser string o elementos html. Por lo general nombre del item
+     * @param      {String}       options.item.imgSrc       Si llega, en vez de armarse un icono default, se agrega un <img>
+     * @param      {Integer}      options.item.index        Indice para los datasets (Necesario para boton eliminar)
+     */
+    renderItem({item}) {
+        const divItem = document.createElement('div');
+        const divDescription = document.createElement('div');
+        const icon = document.createElement('i');
+        const img = document.createElement('img');
+        const iconDelete = document.createElement('i');
+        const buttonDelete = document.createElement('button');
+
+        divItem.classList.add('item');
+        divItem.dataset.index = item.index;
+        if (item.urlLink) {
+            divItem.classList.add('link');
+            divItem.title = Dict.termcap('DROPPER_VER_ARCHIVO');
+            divItem.addEventListener('click', () => { window.open(item.urlLink, '_blank'); })
+        }
+
+        divDescription.classList.add('file_description');
+        divDescription.innerHTML = item.description;
+
+        iconDelete.title = Dict.termcap('DROPPER_BTN_DELETE');
+        iconDelete.classList.add('far', 'fa-trash-alt');
+
+        buttonDelete.type = 'button';
+        buttonDelete.dataset.index = item.index;
+        buttonDelete.addEventListener('click', this._onClickDeleteItem.bind(this));
+        buttonDelete.classList.add('btn_delete');
+        buttonDelete.appendChild(iconDelete);
+
+        if (item.imgSrc) {
+            img.src = item.imgSrc;
+            img.classList.add('icon_item');
+            divItem.appendChild(img);
+        } else {
+            // icon.classList.add(...item.classesIcon)
+            icon.classList.add('icon_item', 'far', 'fa-file');
+            divItem.appendChild(icon);
+        }
+        divItem.appendChild(divDescription);
+        if (!item.withoutDelete) {
+            divItem.appendChild(buttonDelete);
+        }
+
+
+        this.getElementListItems().appendChild(divItem);
+
+        this.data.itemsCount = this.data.itemsCount + 1;
+    }
+
+    /**
+     * Formatea la descripcion para mostrar el item
+     *
+     * @method     _formatDescriptionFile
+     *
+     * @param      {Object}     options.file     'name': nombre del archivo y 'size': tamanio en bytes
+     *
+     * @return     {Stirng}     Descipcion HTML formateada
+     */
+    _formatDescriptionFile({file}) {
+        let size = (file.size > 0 && file.size < 1024)
+            ? 1
+            : file.size / 1024;
+        return `
+            <div class="file_name">${file.name}</div>
+            <div class="file_size">${Math.round(size)}kb</div>
+        `;
+    }
+
+    isAllowAddItems() {
+        if (!this.data.limitItems) {
+            // No hay limite establecido
+            return true;
+        } else if (this.data.limitItems > this.data.itemsCount) {
+            // Hay limite establecido y es mayor que los items agregados
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    hide() {
+        this.getContainerDropArea().style.display = 'none';
+    }
+
+    show() {
+        this.getContainerDropArea().style.display = '';
+    }
+
+    hideDropArea() {
+        this.getElementDropArea().style.display = 'none';
+    }
+
+    showDropArea() {
+        this.getElementDropArea().style.display = '';
+    }
+
+    showListItems() {
+        this.getElementListItems().style.display = '';
+    }
+
+    hideListItems() {
+        this.getElementListItems().style.display = 'none';
+    }
+
+    _onDragEnter(event) {
+        this._cleanClasses();
+        this.getElementDropArea().classList.add(...this.classes.onDragEnter)
+
+        // Ejecutamos evento si llego al instanciar la clase
+        if (this.events.onDragEnter) { this.events.onDragEnter(event) }
+    }
+
+    _onDragOver(event) {
+        this._cleanClasses();
+        this.getElementDropArea().classList.add(...this.classes.onDragOver)
+
+        // Ejecutamos evento si llego al instanciar la clase
+        if (this.events.onDragOver) { this.events.onDragOver(event) }
+    }
+
+    _onDragLeave(event) {
+        this._cleanClasses();
+        this.getElementDropArea().classList.add(...this.classes.onDragLeave)
+
+        // Ejecutamos evento si llego al instanciar la clase
+        if (this.events.onDragLeave) { this.events.onDragLeave(event) }
+    }
+
+    _onDrop(event) {
+        this._cleanClasses();
+        this.getElementDropArea().classList.add(...this.classes.onDrop)
+
+        this.getElementInputFile().files = event.dataTransfer.files;
+        // Disparamos evento this._onInputFileChange();
+        this.getElementInputFile().dispatchEvent(new Event('change'));
+
+        // Ejecutamos evento si llego al instanciar la clase
+        if (this.events.onDrop) { this.events.onDrop(event, this) }
+
+    }
+
+    /**
+     * Si llegan archivos, ya sea mediante el arrastre al area dropeable, mediante la busqueda
+     * en el explorador de archivos o al borrar un item, se lo analiza y muestra el listado
+     * de items y el area dropeable la muestra/oculta dependiendo del limite que se le marco
+     *
+     * @method     _onInputFileChange
+     *
+     * @param      {EventChange}               event     Evento change asociado al input this.getElementInputFile()
+     */
+    _onInputFileChange(event) {
+        const files = this.getElementInputFile().files;
+        this.data.itemsCount = 0;
+        this.getElementListItems().innerHTML = null;
+        this.hideListItems();
+
+        if (files.length) {
+
+            if( files.length > this.data.limitItems && this.data.throwErrorOnLimitPass){
+                this._throwErrorOnLimitPass();
+                this.reset();
+            } else {
+                let arrayFiles = [];
+
+                if (!this.data.limitItems || this.data.limitItems == 1) {
+                    arrayFiles.push(files[0]);
+                } else {
+                    // TODO: Al tener esto para archivos simples, se deja asi
+                    arrayFiles.push(files[0]);
+                }
+
+                arrayFiles.map((file, index) => this.renderItem({
+                    item: {
+                        index,
+                        description: this._formatDescriptionFile({file})
+                    }
+                }));
+                this.showListItems();
+            }
+        }
+
+        if (!this.isAllowAddItems()) { this.hideDropArea(); } else { this.showDropArea() }
+
+        // Ejecutamos evento si llego al instanciar la clase
+        if (this.events.onInputFileChange) { this.events.onInputFileChange(event, this) }
+    }
+
+    _throwErrorOnLimitPass() {
+        alert( Dict.interpolate( Dict.termcap('DROPPER_MAXIMO_ARCHIVOS'), { limit: this.data.limitItems }));
+    }
+
+    _onClickDeleteItem(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        // Solo se acepta el click sobre el icono (tags: svg o path)
+        if (event.target.tagName.toLowerCase() == 'button') { return; }
+
+        const indexItem = event.currentTarget.dataset.index;
+        const item = this.getElementListItems().querySelector('.item[data-index="'+indexItem+'"]');
+        item.remove();
+
+        this.data.itemsCount = this.data.itemsCount - 1;
+
+        if (!this.data.limitItems || this.data.limitItems == 1) {
+            this.getElementInputFile().value = '';
+        } else {
+            // TODO: Por ahora al tener subida de archivos simple, vaciamos el input file
+            this.getElementInputFile().value = '';
+        }
+        this.getElementInputFile().dispatchEvent(new Event('change'));
+    }
+
+    reset() {
+        this.data.itemsCount = 0;
+        this.getElementInputFile().value = '';
+        this.getElementInputFile().dispatchEvent(new Event('change'));
+    }
+
+    _cleanClasses() {
+        this.getElementDropArea().classList.remove(
+            ...this.classes.onDragEnter, ...this.classes.onDragOver,
+            ...this.classes.onDragLeave, ...this.classes.onDrop
+        );
+    }
+
+}
+
+const Utils = {
+
+    /**
+     * Verifica si un string representa una fecha valida en cierto idioma
+     *
+     * @param {string} date     El string que representa la fecha
+     * @param {string} locale   Idioma de la fecha
+     *
+     * @return {bool}  Si es string es una fecha valida o no
+     */
+    isDate: (date, locale) => {
+        const dashRegExp = /^\d{1,2}\-\d{1,2}\-\d{4}$/;
+        const slashRegExp = /^\d{1,2}\/\d{1,2}\/\d{4}$/;
+        const validRegExp = {
+            'es-AR': () => slashRegExp.test(date),
+            'en-GB': () => slashRegExp.test(date),
+            'es-ES': () => slashRegExp.test(date),
+            'ca-ES': () => slashRegExp.test(date),
+            'pt-PT': () => dashRegExp.test(date),
+        }
+
+        if ( !validRegExp[locale]() ) {
+
+            return false;
+        }
+
+        if (locale == 'en-GB') {
+            var [month, day, year] = date.split('/');
+        } else if (locale == 'pt-PT' ) {
+            var [day, month, year] = date.split('-');
+        } else {
+            var [day, month, year] = date.split('/');
+        }
+
+        const timestamp = Date.parse(`${year}-${month}-${day}`);
+        if (isNaN( timestamp )) {
+
+            return false;
+        }
+
+        //HACK: Implementacion de Date.parse en navegadores basados en Chromium
+        const objDate = new Date(timestamp);
+        if ( parseInt(month) != (objDate.getUTCMonth() + 1) ) {
+
+            return false;
+        }
+
+        return true;
+    }
+}

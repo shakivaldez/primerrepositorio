@@ -1,0 +1,649 @@
+/********************************************************************************/
+/*                                                                              */
+/* Plataforma e-ducativa.  Version 14.05.00-109 - Argentina                     */
+/*                                                                              */
+/* Copyright (c)  de e-ducativa Educación Virtual S.A.                          */
+/*                                                                              */
+/********************************************************************************/
+/* layout */
+
+.header_nav  	 	{ position: fixed; top: 0; width: 100%; border-bottom: solid 1px #d6d6d6; z-index: 100; box-shadow: 0 0 15px 0 rgba(0,0,0,.4); transition-duration: .4s; }
+.header_nav .logo 	{ position: absolute; top: 0; left: 0; overflow: hidden; background-color: #fff; }
+
+.function_bar,
+.location_bar   	{ position: relative; height: 2.25em; padding: 0 10px 0 116px; transition: all .4s; }
+
+.location_bar       { display: flex; align-items: center; background-color: rgba(0,0,0,.2); }
+
+/* css reset */
+.header_nav button,
+.header_nav a  { margin: 0; padding: 0; background: transparent; border: none; text-decoration: none; outline: none; cursor: pointer; }
+
+/* nombre instalacion */
+.function_bar .nombre_instalacion {
+    display: inline-block;
+    max-width: 45%;
+    height: 2.25rem;
+	padding: .7em 10px 0;
+    box-sizing: border-box;
+	vertical-align: middle;
+	text-decoration: none;
+	color: rgba(255,255,255,0.9);
+    font-family: 'Roboto Condensed', sans-serif;
+    font-weight: 400;
+    font-size: .9rem;
+	transition: all .4s;
+}
+.function_bar a.nombre_instalacion:hover    { background-color: rgba(255,255,255,.3); color: rgba(255,255,255,1); padding-left: 13px; padding-right: 7px; }
+.backend .function_bar .nombre_instalacion  { color: #fff; }
+
+/* Logo principal */
+.header_nav .logo { z-index: 1; }
+
+.header_nav .logo img {
+    display: block;
+    height: 4.5rem;
+    transition: all .4s;
+}
+.header_nav a.logo:hover img {
+    opacity: .8;
+    transform: scale(1.05);
+}
+/* ubicacion */
+.location_bar .ubicacion_frame {
+    display: inline-block;
+    height: 2.25rem;
+    padding: .5rem 10px 0;
+    box-sizing: border-box;
+    vertical-align: middle;
+    font-family: 'Roboto Condensed', sans-serif;
+    font-size: 1rem;
+    font-weight: 300;
+    text-decoration: none;
+    color: rgba(255, 255, 255, .8);
+}
+.location_bar a.ubicacion_frame:hover {
+    color: rgba(255,255,255,1);
+    /*! background-color: rgba(255,255,255,.3); */
+}
+.location_bar .ubicacion_separador {
+    display: inline-block;
+    padding: 0 6px;
+    vertical-align: middle;
+    font-size: .875rem;
+    color: #ffffff;
+    opacity: .5;
+}
+/* cambio de administraciones */
+.btn_change_curso {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 26px;
+    width: 26px;
+    margin-right: 40px;
+    border-radius: 45px;
+    text-align: center;
+    cursor: pointer;
+    transition-duration: .2s;
+}
+.btn_change_curso:hover { background-color: rgba(255, 255, 255, 0.13); }
+
+.btn_change_curso .icono {
+    height: 2.25rem;
+    width: 1rem;
+    box-sizing: border-box;
+    border-radius: 45px;
+    color: #fff;
+    opacity: .6;
+    transition-duration: .15s;
+}
+.btn_change_curso.view_combo_cursos .icono { transform: rotate(90deg); }
+
+/* combo cursos y combo administraciones - contempla el select2 */
+.comboCursos-Frame {
+    display: inline-block;
+    min-width: 200px;
+    max-width: 557px;
+    margin-right: 10px;
+    margin-left: 9px;
+    box-sizing: border-box;
+    font-family: 'Roboto Condensed', sans-serif;
+    font-size: 1em;
+    font-weight: 100;
+    opacity: 1;
+    cursor: pointer;
+    transition: all .4s;
+}
+.comboCursos-Frame span.select2-container--default{
+    max-width: 65%;
+    min-width: 170px;
+}
+.comboCursos-Frame select:hover,
+.comboCursos-Frame select:focus  { outline: none; opacity: 1; }
+.comboCursos-Frame select.color_plataforma_back { color: #fff; }
+
+.comboCursos-Frame option 			{ color: #000; background-color: #fff; }
+.comboCursos-Frame option.no-activo { background-color: #ccc; }
+
+/* Nombre de usuario */
+.user_fullname {
+    margin-right: 53px;
+    margin-left: auto;
+    padding: 10px 12px;
+    font-size: .8rem;
+    color: #ffffff;
+    white-space: nowrap;
+    border-radius: 1px;
+    cursor: pointer;
+    opacity: .8;
+    transition: all .2s;
+}
+.user_fullname > a { color: #ffffff; }
+
+.user_fullname:hover {
+    /*! background-color: rgba(255,255,255,.3); */
+    opacity: 1;
+}
+.user_fullname.hidden { display: none; }
+
+.function_bar .col_derecha  { position: relative; float: right; height: 100%; padding-right: 48px; }
+
+/* botones (app) */
+.function_bar .apps_box                 { position: relative; }
+.function_bar .apps_button              { display: none; height: 2.25rem; width: 2.25rem; text-align: center;  }
+.function_bar .apps_button:hover        { background-color: rgba( 255,255,255,.2 ); }
+
+.function_bar .apps_button .icono       { color: #fff; width: 25px; height: 25px; }
+.function_bar .apps_button .icono.up    { display: none; }
+
+.function_bar .apps {
+    display: flex;
+    position: relative;
+    align-items: center;
+    height: 2.25em;
+    transition-duration: .4s;
+}
+.function_bar .app {
+    opacity: .9;
+    display: flex;
+    align-items: center;
+    padding: 7px 12px;
+    font-family: 'Roboto', sans-serif;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition-duration: .1s;
+}
+.function_bar .app:hover {
+    opacity: 1;
+    background-color: rgba(255, 255, 255, 0.2);
+}
+.function_bar .app .icono {
+    font-size: 1.065rem;
+    color: #fff;
+}
+
+/*Redefinicion de lo que se hizo en admin.css para la clase .svg-inline--fa*/
+.function_bar .app svg.svg-inline--fa {
+    margin: inherit;
+}
+.function_bar .app .label {
+    display: block;
+    margin-left: 7px;
+    font-size: .8125rem;
+    text-decoration: none;
+    color: #fff;
+}
+.function_bar .app.admin_link { width: 128px; }
+
+.function_bar .app .icono.external_link {
+    width: auto;
+    padding-left: 6px;
+    font-size: 0.688rem;
+}
+.mensajes_link { position: relative; }
+
+.function_bar .mail_alert { display: none; }
+
+.function_bar.mail_alert_on .mail_alert {
+    display: block;
+    position: absolute;
+    left: 7px;
+    bottom: 5px;
+    width: 8px;
+    height: 8px;
+    border-radius: 100px;
+    border: 2px solid rgba(255, 255, 255, 0.9);
+    color: #ed3322;
+    transition-duration: .4s;
+    animation-duration: 1.5s;
+    animation-name: mailalert-anima;
+    animation-iteration-count: 2;
+    animation-timing-function: ease-in-out;
+    animation-delay: 1.3s;
+    z-index: 2;
+}
+/* animacion notificacion de mail */
+@keyframes mailalert-anima {
+	0%, 25%, 50%, 75%, 100%		{ transform: scale(1); }
+	12.5%, 37.5%, 62.5%, 87.5%	{ transform: scale(1.2); }
+}
+
+/* scrolled */
+body:not(.not-logged) .scrolled .header_nav				{ margin-top: -2.25rem; }
+body:not(.not-logged) .scrolled .header_nav .logo img 	{ margin-top: 2.25rem; height: 2.25rem; }
+body:not(.not-logged) .scrolled .location_bar 			{ padding-left: 60px; }
+body:not(.not-logged) .scrolled .menu_usuario_frame		{ margin-top: 2.25rem; }
+
+body:not(.not-logged) .scrolled .mensajes_popup:before,
+body:not(.not-logged) .scrolled .mensajes_popup:after           { display: none; }
+body:not(.not-logged) .scrolled .mensajes_popup                 { margin-top: 20px; }
+body:not(.not-logged) .scrolled .mensajes_function .cerrar_bt   { top: 0; }
+
+
+/********************************
+* ******** Codigo QR ********** *
+*********************************/
+/*
+  * @Objeto: Ventana modal
+*/
+.modal_overlay   {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: 0;
+    padding: 0;
+    z-index: 999;
+    background-color: rgba(0, 0, 0,.7);
+}
+.modal_overlay.oculto { display: none; }
+
+.modal_container {
+    position: relative;
+    padding: 10px;
+    background-color: #FFF;
+    box-shadow: 0 0 20px 0 rgba(0,0,0,0.8);
+}
+.modal_container .modal_close_btn {
+    position: absolute;
+    top: -15px;
+    right: -15px;
+    width: 30px;
+    height: 30px;
+    border-radius: 30px;
+    background-color: #000;
+    transition-duration: .4s;
+    cursor: pointer;
+}
+.modal_container .modal_close_btn .icon {
+    width: 30px;
+    height: 30px;
+    color: #fff;
+    transition-duration: .4s;
+}
+.modal_container .modal_close_btn:hover { background-color: #fff; }
+
+.modal_container .modal_close_btn:hover .icon { color: #000; }
+
+body.noscroll { overflow: hidden; }
+
+
+/*
+  * @Objeto: Ventana modal QR
+*/
+
+.modal_container.qr { width: 300px; }
+
+.modal_container.qr .desc {
+    padding: 10px 0;
+    font-size: .9rem;
+}
+.qr_data { position: relative; }
+
+.qr_data .qr_overlay {
+    margin-left: -3px;
+    margin-top: -3px;
+    background-image: url(../img/comunes/qr_overlay.png);
+    width: 75px;
+    height: 89px;
+    position: absolute;
+    /*top: 50%;
+    left: 50%;*/
+    top: 145px;
+    left: 145px;
+    transform: translate(-50%, -50%);
+    outline: none;
+}
+.qr_update {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-color: rgba(50,50,50,.95);
+    transition-duration:.4s;
+    cursor: pointer;
+}
+.qr_update .icon        { width: 175px; height: 175px; color: rgba(100,100,100,.9); transition-duration: .4; }
+.qr_update:hover        { background-color: rgba(0,0,0,0.95); }
+.qr_update:hover .icon  { color: rgba(255,255,255,0.8); }
+
+
+/********************************
+* **** Mensajes NO leidos ***** *
+*********************************/
+.mensajes_popup:before {
+	display: block;
+    position: absolute;
+	bottom: 100%;
+	right: 16px;
+	content: '';
+	width: 0;
+	height: 0;
+	border-width: 0 5px 8px 5px;
+	border-style: solid;
+	border-color: transparent transparent #ffffff transparent;
+	z-index: 114;
+}
+.mensajes_popup {
+    position: absolute;
+    top: 34px;
+    right: 13px;
+    width: 500px;
+    min-height: 3em;
+    padding: 3px;
+    border-right: none;
+    border-radius: 2px;
+    background-color: #fff;
+    box-shadow: 1px 3px 6px 0 rgba(0, 0, 0, 0.4);
+    transition-duration: .4s;
+    z-index: 112;
+}
+.mensajes_popup:after {
+    display: block;
+    position: absolute;
+    bottom: 100%;
+    right: 15px;
+    content: '';
+    width: 0;
+    height: 0;
+    border-width: 0 6px 10px 6px;
+    border-style: solid;
+    border-color: transparent transparent #c0c0c0 transparent;
+    z-index: 113;
+}
+.Correo-spinner { background: #ddd url(../img/comunes/spinner.gif) no-repeat center; }
+
+.mensajes_function              { position: relative; }
+.mensajes_function > header    	{ border-bottom: 3px solid #eee; padding: 5px 8px; }
+.mensajes_function > header h2 	{ margin: 0; padding: 0; color: #616161; font-family: 'Roboto', sans-serif; font-weight: 400; font-size: .938rem; }
+
+.mensajes_function .cerrar_bt {
+    position: absolute;
+    top: 2px;
+    right: 8px;
+    transition-duration: .3s;
+}
+.mensajes_function .cerrar {
+    width: 12px;
+    height: 12px;
+    padding: 4px;
+    border-radius: 20px;
+    color: #ffffff;
+    background-color: #646464;
+    opacity: .7;
+    transition-duration: .4s;
+}
+.mensajes_function .cerrar:hover {
+    color: #ffffff;
+    background-color: #666666;
+    opacity: 1;
+}
+.mensajes_function .seccion_vacia { margin: 10px 10px; }
+
+.mensajes_function .lista_mensajes { list-style: none; margin: 0; padding: 0; } /* css reset */
+
+.mensajes_function .lista_mensajes li {
+    margin-bottom: 1px;
+    border-bottom: 1px solid #d2d2d2;
+}
+.mensajes_function .lista_mensajes li > a 		{ display: block; padding: 12px 10px; color: #7d7d7d; text-decoration: none; background-color: #f5f5f5; transition-duration: .2s; }
+.mensajes_function .lista_mensajes li > a:hover { padding: 12px 5px 12px 15px; background-color: #fff; }
+
+.mensajes_function .lista_mensajes .adjunto 	{ display:inline-block; width: .9rem; padding-right: 4px; }
+.mensajes_function .lista_mensajes .subject		{ color: #000; padding: 3px 0; font-size: .95rem; font-weight: bold; }
+.mensajes_function .lista_mensajes .from		{ color: #000; font-size: .85rem; }
+.mensajes_function .lista_mensajes .aula		{ font-size: .85rem; }
+.mensajes_function .lista_mensajes .date		{ padding-top: 3px; font-size: .75rem; font-weight: 300; }
+
+
+/* **************************
+    menu desplegable usuario
+***************************** */
+.menu_usuario_frame { position: absolute; top: .75em; right: 0; z-index: 109; transition-duration: .3s; }
+
+.menu_usuario_frame .usuario {
+    width: 40px;
+    height: 40px;
+    border-radius: 45px;
+    overflow: hidden;
+    cursor: pointer;
+    box-shadow: 0 0 2px #010712;
+    transition: all .2s;
+}
+.menu_usuario_frame .usuario .thumb  { display: inline-block; vertical-align: middle; }
+
+.menu_usuario_frame .nombre_usuario {
+    margin-bottom: 4px;
+    padding: 4px 8px;
+    font-family: 'Roboto Condensed', sans-serif;
+    font-size: .8rem;
+    border-radius: 2px;
+    color: #ffffff;
+    background-color: #1d4e99;
+}
+.menu_usuario_frame .nombre_usuario.hidden { display: none; }
+
+.menu_usuario_frame .usuario:not(.activo):hover,
+.menu_usuario_frame .usuario.activo { transform: scale(1.05);}
+
+.menu_usuario_frame .usuario.login,
+.menu_usuario_frame .usuario.login:not(.activo):hover { background-image: none; }
+
+.menu_usuario_frame .opciones_frame:before {
+    display: block;
+    content: '';
+    position: absolute;
+    bottom: 100%;
+    right: 13px;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 0 6px 10px 6px;
+    border-color: transparent transparent #c0c0c0 transparent;
+    z-index: 111;
+}
+.menu_usuario_frame .opciones_frame {
+    position: absolute;
+    top: calc(100% + 2px);
+    right: 0;
+    min-width: 210px;
+    width: 130%;
+    margin-top: 12px;
+    padding: 8px 4px 6px;
+    border: 1px solid #c0c0c0;
+    border-radius: 4px;
+    background-color: #fff;
+    box-shadow: 2px 3px 14px 0 rgba(0, 0, 0, 0.3);
+    z-index: 110;
+}
+.menu_usuario_frame .opciones_frame:after {
+    display: block;
+    content: '';
+    position: absolute;
+    right: 14px;
+    bottom: 100%;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 0 5px 8px 5px;
+    border-color: transparent transparent #ffffff transparent;
+    z-index: 112;
+}
+.menu_usuario_frame .listado_opciones {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+}
+
+.menu_usuario_frame .opcion_menu_usuario a {
+    display: block;
+    margin-bottom: 1px;
+    padding: 8px;
+    font-size: .9em;
+    text-decoration: none;
+    color: #000;
+    transition: all .2s;
+}
+.menu_usuario_frame .opcion_menu_usuario a:hover {
+    padding: 8px 5px 8px 11px;
+    color: #0d428f;
+    border-radius: 2px;
+    background-color: #ebf0fa;
+}
+.scroll_top {
+    position: fixed;
+    right: -100px;
+    bottom: 85px;
+    padding: 10px;
+    color: #757575;
+    border: 1px solid rgba(0, 0, 0, .1);
+    border-right: none;
+    border-radius: 10px 0 0 10px;
+    cursor: pointer;
+    background-color: rgba(0, 0, 0, .1);
+    transition-duration: .2s;
+    z-index: 999;
+}
+.scroll_top.in_proctorizer{
+    bottom: 120px;
+}
+.scroll_top:hover {
+    padding-right: 15px;
+    color: #6c6c6c;
+    background-color: rgba(236, 236, 236, .7);
+}
+.scroll_top.show { right: 0; }
+
+/********** no loggeado *************/
+.not-logged .header_nav .logo img 		{ height: 2.25rem !important; }
+.not-logged .function_bar 				{ padding-left: 60px; }
+.not-logged .function_bar .col_derecha 	{ padding-right: 0; }
+
+
+/* ---------------
+    Responsive
+------------------ */
+@media only screen and (max-width : 1400px) {
+    .function_bar .nombre_instalacion   { max-width: 36%; }
+}
+
+@media only screen and (max-width : 1200px) {
+    /* iconos pierden el texto */
+    .function_bar .nombre_instalacion { max-width: 50%; }
+
+    .function_bar .col_derecha { padding-right: 53px; }
+
+    .function_bar .app { padding: 7px 10px; }
+
+    .function_bar .app:hover { padding: 7px 10px; }
+
+    .function_bar .app:hover .icono { transform: scale(1.1); }
+
+    .function_bar .app .icono.external_link { display: none; }
+
+    .function_bar .app.admin_link {
+        width: auto;
+        padding: 7px 10px;
+    }
+    .function_bar .app .label { display: none; }
+
+    .function_bar.mail_alert_on .mail_alert { left: 0; }
+}
+
+@media only screen and (max-width : 780px) {
+    .header_nav .logo { display: none; }
+
+    .not-logged .function_bar,
+    body:not(.not-logged) .scrolled .location_bar,
+    .function_bar, .location_bar { padding-left: 0; }
+
+    /* ventana de mail no leido se reacomoda */
+    .mensajes_popup:after,
+    .mensajes_popup:before { display: none; }
+
+    .mensajes_popup { position: fixed; width: auto; top: 2.25rem; left: 20px; right: 20px; overflow-y: auto; }
+
+    body:not(.not-logged) .scrolled .mensajes_popup { margin-top: 0; }
+
+    .mensajes_function .cerrar_bt { top: 0; }
+
+    .function_bar .col_derecha { padding-right: 37px; }
+
+    .user_fullname { display: none; }
+    /*
+     * Por default, javascript crea el nombre del menu como hidden
+     * Solo es visible siempre en pantallas chicas
+     * Se deja que javascript actue siempre igual, y "deshabilitamos" la clase .hidden
+     * para casos responsive
+    */
+    .menu_usuario_frame .nombre_usuario.hidden { display: block; }
+
+    .menu_usuario_frame {
+        top: 6px;
+        right: 1px;
+    }
+    .menu_usuario_frame .usuario {
+        width: 24px;
+        height: 24px;
+    }
+    .menu_usuario_frame .usuario .thumb { width: 100%; }
+
+    .menu_usuario_frame .opciones_frame:before { right: 7px; }
+    .menu_usuario_frame .opciones_frame:after { right: 8px; }
+
+    .btn_change_curso { margin-right: 6px; }
+}
+
+@media only screen and (max-width : 540px) {
+    /* aparece icono de desplegar apps */
+    body:not(.not-logged) .function_bar .apps_button { display: inline; }
+    body:not(.not-logged) .function_bar.show_apps .icono.up { display: inline; }
+
+    body:not(.not-logged) .function_bar.show_apps .icono.down { display: none; }
+    body:not(.not-logged) .function_bar.show_apps .apps_button .mail_alert { opacity: 0; }
+
+    body:not(.not-logged) .function_bar .apps { position: absolute; top: -50px; right: 2.25rem; }
+    body:not(.not-logged) .function_bar.show_apps .apps { top: 0; }
+
+    body:not(.not-logged) .function_bar .nombre_instalacion { position: absolute; left: 0; top: 0; }
+    body:not(.not-logged) .function_bar.show_apps .nombre_instalacion { max-width: 25%; }
+    body:not(.not-logged) .comboCursos-Frame span.select2-container--default {max-width: 165px; min-width: 100px;}
+
+    .function_bar .col_derecha { padding-right: 34px; }
+}
+
+@media only screen and (max-width : 362px) {
+    body:not(.not-logged) .function_bar .nombre_instalacion { position: absolute; left: 0; top: 0; }
+    body:not(.not-logged) .function_bar.show_apps .nombre_instalacion { top: -50px; }
+
+}
